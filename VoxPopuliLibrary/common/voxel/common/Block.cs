@@ -3,9 +3,9 @@
  * Copyrights Florian Pfeiffer
  * Author Florian Pfeiffer
  */
+using OpenTK.Mathematics;
 using VoxPopuliLibrary.client.graphic;
 using VoxPopuliLibrary.common.physic;
-using OpenTK.Mathematics;
 
 namespace VoxPopuliLibrary.common.voxel.common
 {
@@ -263,7 +263,8 @@ namespace VoxPopuliLibrary.common.voxel.common
             if (id == 0)
             {
                 return false;
-            }else
+            }
+            else
             {
                 return true;
             }

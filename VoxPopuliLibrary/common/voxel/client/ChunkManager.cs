@@ -7,33 +7,40 @@ using K4os.Compression.LZ4;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
+using System.Collections.Concurrent;
+using System.ComponentModel.Design;
+using System.Net.Sockets;
 using VoxPopuliLibrary.client;
 using VoxPopuliLibrary.client.graphic;
-using VoxPopuliLibrary.client.graphic.renderer;
-using VoxPopuliLibrary.common.voxel.common;
-using VoxPopuliLibrary.client;
-using VoxPopuliLibrary.common.physic;
-using VoxPopuliLibrary.common.voxel.common;
 using VoxPopuliLibrary.common.ecs;
 using VoxPopuliLibrary.common.ecs.client;
+using VoxPopuliLibrary.common.voxel.common;
 
 namespace VoxPopuliLibrary.common.voxel.client
 {
-    public static class Chunk_Manager
+    internal static class Chunk_Manager
     {
-        public static Dictionary<Vector2i, Chunk> clist = new Dictionary<Vector2i, Chunk>();
-        private static int chunk_fra = 0;
-        public static void Update(Shader _shader, Vector3d pos)
+        internal static Dictionary<Vector2i, Chunk> Clist = new Dictionary<Vector2i, Chunk>();
+       /* internal static ConcurrentQueue<Chunk> ChunkMeshToGenerate = new ConcurrentQueue<Chunk>();
+       
+        private static int numThreads = 0; // nombre actuel de threads en cours d'exécution
+        private static object threadLock = new object(); // verrou pour gérer l'accès à numThreads
+        private static Thread[] threads;*/
+        internal static void Update(Vector3d pos)
         {
-            chunk_fra = 0;
-            loadchunk(pos);
-            loadchunkmesh(_shader);
+            GetChunk(pos);
+            GenerateChunksMesh();
         }
         internal static void ClearAllChunk()
         {
-            clist.Clear();
-        }
-        static void loadchunk(Vector3d Position)
+            Clist.Clear();
+        }/*
+        internal static void AddChunkToQueue(Chunk chunk)
+        {
+            ChunkMeshToGenerate.Enqueue(chunk);
+        }*/
+
+        static void GetChunk(Vector3d Position)
         {
             int minx = (int)(Position.X / 16) - GlobalVariable.Distance;
             int minz = (int)(Position.Z / 16) - GlobalVariable.Distance;
@@ -44,7 +51,7 @@ namespace VoxPopuliLibrary.common.voxel.client
             {
                 for (int z = minz; z <= maxz; z++)
                 {
-                    if (!clist.TryGetValue(new Vector2i(x, z), out Chunk fsdfgris))
+                    if (!Clist.TryGetValue(new Vector2i(x, z), out Chunk fsdfgris))
                     {
                         var message = new NetDataWriter();
                         message.Put(Convert.ToUInt16(network.NetworkProtocol.ChunkDemand));
@@ -60,7 +67,7 @@ namespace VoxPopuliLibrary.common.voxel.client
         }
         static void ClearNotUsedChunk()
         {
-            foreach (Chunk chunk in clist.Values)
+            foreach (Chunk chunk in Clist.Values)
             {
                 foreach (Player player in PlayerFactory.PlayerList.Values)
                 {
@@ -71,23 +78,52 @@ namespace VoxPopuliLibrary.common.voxel.client
 
                     if (!(chunk.Position.X >= minx && chunk.Position.X <= maxx && chunk.Position.Y >= minz && chunk.Position.Y <= maxz))
                     {
-                        clist.Remove(chunk.Position);
+                        Clist.Remove(chunk.Position ,out Chunk nothing);
                     }
                 }
             }
         }
-        static void loadchunkmesh(Shader _shader)
+        static internal void GenerateChunksMesh()
         {
-            foreach (Chunk ch in clist.Values)
+            foreach(Chunk chunk in Clist.Values)
             {
-                if (ch.Changed == true && clist.ContainsKey(new Vector2i(ch.Position.X + 1, ch.Position.Y)) && clist.ContainsKey(new Vector2i(ch.Position.X - 1, ch.Position.Y)) && clist.ContainsKey(new Vector2i(ch.Position.X, ch.Position.Y + 1)) && clist.ContainsKey(new Vector2i(ch.Position.X, ch.Position.Y - 1)))
+                if (chunk.Changed == true && Clist.ContainsKey(new Vector2i(chunk.Position.X + 1, chunk.Position.Y)) &&
+                    Clist.ContainsKey(new Vector2i(chunk.Position.X - 1, chunk.Position.Y)) && 
+                        
+                    Clist.ContainsKey(new Vector2i(chunk.Position.X, chunk.Position.Y + 1)) &&
+                    Clist.ContainsKey(new Vector2i(chunk.Position.X, chunk.Position.Y - 1)))
 
                 {
-                    ch.GenerateMesh();
+                    chunk.GenerateMesh();
+                }
+                //AddChunkToQueue(chunk);
+            }/*
+            while (ChunkMeshToGenerate.Count > 0 && numThreads < GlobalVariable.maxThreads)
+            {
+                lock (threadLock)
+                {
+                    numThreads++;
+                }
+
+                Thread thread = new Thread(new ThreadStart(ThreadedGenerateMeshes));
+                thread.Start();
+            }*/
+
+        }/*
+        private static void ThreadedGenerateMeshes()
+        {
+            Chunk chunk;
+            while (ChunkMeshToGenerate.TryDequeue(out chunk))
+            {
+                chunk.GenerateMesh();
+
+                lock (threadLock)
+                {
+                    numThreads--;
                 }
             }
-        }
-        public static void RenderChunk(Vector3 campos)
+        }*/
+        internal static void RenderChunk(Vector3 campos)
         {
             int minx = (int)(campos.X / 16) - GlobalVariable.Distance;
             int minz = (int)(campos.Z / 16) - GlobalVariable.Distance;
@@ -98,25 +134,25 @@ namespace VoxPopuliLibrary.common.voxel.client
             {
                 for (int z = minz; z <= maxz; z++)
                 {
-                    if (clist.TryGetValue(new Vector2i(x, z), out Chunk ch))
+                    if (Clist.TryGetValue(new Vector2i(x, z), out Chunk ch))
                     {
                         ch.Render();
                     }
                 }
             }
         }
-        public static Chunk getchunk(int x, int y)
+        internal static Chunk getchunk(int x, int y)
         {
-            if (clist.TryGetValue(new Vector2i(x, y), out Chunk ch))
+            if (Clist.TryGetValue(new Vector2i(x, y), out Chunk ch))
             {
                 return ch;
             }
             else
             {
-                throw new Exception("The demanded chunk not exist in client memory.");
+                throw new Exception("Chunk is not loaded");
             }
         }
-        public static void ChangeChunk(Vector3d blockp, ushort block)
+        internal static void ChangeChunk(Vector3d blockp, ushort block)
         {
             (Vector2i cpos, Vector3i bpos) = math.Coord.GetVoxelCoord(blockp);
             var message = new NetDataWriter();
@@ -132,41 +168,41 @@ namespace VoxPopuliLibrary.common.voxel.client
                 VoxPopuliLibrary.client.network.Network.client.FirstPeer.Send(message, DeliveryMethod.ReliableUnordered);
             }
         }
-        public static void HandleChunk(NetDataReader data, NetPeer peer)
+        internal static void HandleChunk(NetDataReader data, NetPeer peer)
         {
             Vector2i cpos = new Vector2i(data.GetInt(), data.GetInt());
             byte[] blocks = data.GetRemainingBytes();
 
             blocks = LZ4Pickler.Unpickle(blocks);
             ushort[] block = Utils.bytestoints(blocks);
-            if (!clist.TryGetValue(cpos, out Chunk vtff))
+            if (!Clist.TryGetValue(cpos, out Chunk vtff))
             {
-                clist.Add(cpos, new Chunk(block, cpos));
+                Clist.Add(cpos, new Chunk(block, cpos));
             }
         }
-        public static async void HandleChunkUpdate(NetDataReader data, NetPeer peer)
+        internal static async void HandleChunkUpdate(NetDataReader data, NetPeer peer)
         {
             ushort block = data.GetUShort();
             Vector2i cpos = new Vector2i(data.GetInt(), data.GetInt());
             Vector3i cpos2 = new Vector3i(data.GetInt(), data.GetInt(), data.GetInt());
-            if (clist.TryGetValue(cpos, out Chunk ch))
+            if (Clist.TryGetValue(cpos, out Chunk ch))
             {
                 ch.SetBlock(cpos2.X, cpos2.Y, cpos2.Z, block);
                 ch.Changed = true;
             }
-            if (clist.TryGetValue(new Vector2i(cpos.X + 1, cpos.Y), out Chunk ch1))
+            if (Clist.TryGetValue(new Vector2i(cpos.X + 1, cpos.Y), out Chunk ch1))
             {
                 ch1.Changed = true;
             }
-            if (clist.TryGetValue(new Vector2i(cpos.X - 1, cpos.Y), out Chunk ch2))
+            if (Clist.TryGetValue(new Vector2i(cpos.X - 1, cpos.Y), out Chunk ch2))
             {
                 ch2.Changed = true;
             }
-            if (clist.TryGetValue(new Vector2i(cpos.X, cpos.Y - 1), out Chunk ch3))
+            if (Clist.TryGetValue(new Vector2i(cpos.X, cpos.Y - 1), out Chunk ch3))
             {
                 ch3.Changed = true;
             }
-            if (clist.TryGetValue(new Vector2i(cpos.X, cpos.Y + 1), out Chunk ch4))
+            if (Clist.TryGetValue(new Vector2i(cpos.X, cpos.Y + 1), out Chunk ch4))
             {
                 ch4.Changed = true;
             }
@@ -174,7 +210,7 @@ namespace VoxPopuliLibrary.common.voxel.client
         internal static bool GetBlock(Vector3d blockp, out ushort id)
         {
             (Vector2i cpos, Vector3i bpos) = math.Coord.GetVoxelCoord(blockp);
-            if (clist.TryGetValue(new Vector2i(cpos.X, cpos.Y), out Chunk ch))
+            if (Clist.TryGetValue(new Vector2i(cpos.X, cpos.Y), out Chunk ch))
             {
                 if (bpos.Y >= 0 && bpos.Y < GlobalVariable.CHUNK_HEIGHT)
                 {
@@ -193,10 +229,10 @@ namespace VoxPopuliLibrary.common.voxel.client
                 return false;
             }
         }
-        internal static bool GetBlock(int x,int y,int z, out ushort id)
+        internal static bool GetBlock(int x, int y, int z, out ushort id)
         {
-            (Vector2i cpos,Vector3i bpos) =math.Coord.GetVoxelCoord(x,y,z);
-            if (clist.TryGetValue(new Vector2i(cpos.X, cpos.Y), out Chunk ch))
+            (Vector2i cpos, Vector3i bpos) = math.Coord.GetVoxelCoord(x, y, z);
+            if (Clist.TryGetValue(new Vector2i(cpos.X, cpos.Y), out Chunk ch))
             {
                 if (bpos.Y >= 0 && bpos.Y < GlobalVariable.CHUNK_HEIGHT)
                 {
@@ -216,9 +252,9 @@ namespace VoxPopuliLibrary.common.voxel.client
             }
         }
     }
-    public static class Utils
+    internal static class Utils
     {
-        public static ushort[] bytestoints(byte[] input)
+        internal static ushort[] bytestoints(byte[] input)
         {
             var size = input.Length / sizeof(short);
             var ints = new ushort[size];
@@ -230,4 +266,3 @@ namespace VoxPopuliLibrary.common.voxel.client
         }
     }
 }
- 

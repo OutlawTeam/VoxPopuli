@@ -8,12 +8,11 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
 using VoxPopuliLibrary.client;
-using VoxPopuliLibrary.common.utils;
-using VoxPopuliLibrary.common.voxel.common;
-using VoxPopuliLibrary.server.program;
-using VoxPopuliLibrary.server.network;
 using VoxPopuliLibrary.common.ecs;
 using VoxPopuliLibrary.common.ecs.server;
+using VoxPopuliLibrary.common.utils;
+using VoxPopuliLibrary.common.voxel.common;
+using VoxPopuliLibrary.server.network;
 
 namespace VoxPopuliLibrary.common.voxel.server
 {
@@ -79,7 +78,7 @@ namespace VoxPopuliLibrary.common.voxel.server
         internal static void Update()
         {
             ChunkToBeAdded.Clear();
-            foreach(Chunk chunk in clist.Values)
+            foreach (Chunk chunk in clist.Values)
             {
                 foreach (Player player in PlayerFactory.List.Values)
                 {
@@ -103,9 +102,9 @@ namespace VoxPopuliLibrary.common.voxel.server
                     }
                 }
             }
-            foreach(Vector2i pos in ChunkToBeAdded)
+            foreach (Vector2i pos in ChunkToBeAdded)
             {
-                if(!clist.TryGetValue(pos, out Chunk Nothing))
+                if (!clist.TryGetValue(pos, out Chunk Nothing))
                 {
                     CreateChunk(pos);
                 }

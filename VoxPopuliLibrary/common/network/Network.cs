@@ -7,6 +7,7 @@ namespace VoxPopuliLibrary.common.network
 {
     public enum NetworkProtocol : ushort
     {
+        ServerVersionSend =1,
         ChunkDemand = 30,
         ChunkData = 31,
         ChunkOneBlockChange = 32,

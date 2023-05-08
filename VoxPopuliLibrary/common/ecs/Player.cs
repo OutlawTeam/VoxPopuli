@@ -1,12 +1,12 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLib;
+﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using VoxPopuliLibrary.client;
 using VoxPopuliLibrary.client.graphic;
-using OpenTK.Graphics.OpenGL4;
-using VoxPopuliLibrary.common.ecs.client;
 using VoxPopuliLibrary.client.graphic.renderer;
+using VoxPopuliLibrary.common.ecs.client;
 namespace VoxPopuliLibrary.common.ecs
 {
     internal class Player : Entity
@@ -38,7 +38,7 @@ namespace VoxPopuliLibrary.common.ecs
         internal Vector3i BlockSePos;
         internal bool BlockIsSec;
 
-        public Player(Vector3d _Position,ushort _ClientID,bool Local,bool Client)
+        public Player(Vector3d _Position, ushort _ClientID, bool Local, bool Client)
         {
             Position = _Position;
             if (Client)
@@ -52,15 +52,16 @@ namespace VoxPopuliLibrary.common.ecs
             ClientID = _ClientID;
         }
         //Client
-        internal new void UpdateClient(float DT,KeyboardState Keyboard,MouseState Mouse)
+        internal new void UpdateClient(float DT, KeyboardState Keyboard, MouseState Mouse)
         {
             base.UpdateClient(DT);
-            
+
             if (Keyboard.IsKeyDown(Keys.W))
             {
                 Acceleration += Front * cameraSpeed * Elevation;
                 forward = true;
-            }else
+            }
+            else
             {
                 forward = false;
             }
@@ -79,7 +80,8 @@ namespace VoxPopuliLibrary.common.ecs
 
                 Acceleration -= Right * cameraSpeed * Elevation;
                 left = true;
-            }else
+            }
+            else
             {
                 left = false;
             }
@@ -94,10 +96,11 @@ namespace VoxPopuliLibrary.common.ecs
             }
             if (Keyboard.IsKeyDown(Keys.Space))
             {
-                if(!Fly)
+                if (!Fly)
                 {
                     Jump();
-                }else
+                }
+                else
                 {
                     Acceleration.Y = cameraSpeed; // Up
                 }
@@ -117,7 +120,8 @@ namespace VoxPopuliLibrary.common.ecs
                     Acceleration.Y = -cameraSpeed; // Down
                 }
                 shift = true;
-            }else
+            }
+            else
             {
                 shift = false;
             }
@@ -132,7 +136,7 @@ namespace VoxPopuliLibrary.common.ecs
                 var deltaX = Mouse.X - _lastPos.X;
                 var deltaY = Mouse.Y - _lastPos.Y;
 
-                
+
                 _lastPos = new Vector2(Mouse.X, Mouse.Y);
                 // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
                 _Camera.Yaw += deltaX * sensitivity;
@@ -145,9 +149,9 @@ namespace VoxPopuliLibrary.common.ecs
             Right = new Vector3(_Camera.Right.X, 0, _Camera.Right.Z);
             SendControl();
             CollisionTerrain(DT);
-            _Camera.Position = new Vector3((float)Position.X, (float)Position.Y+EntityEYEHeight, (float)Position.Z);
+            _Camera.Position = new Vector3((float)Position.X, (float)Position.Y + EntityEYEHeight, (float)Position.Z);
         }
-       
+
         internal void SendControl()
         {
             NetDataWriter message = new NetDataWriter();
@@ -168,7 +172,7 @@ namespace VoxPopuliLibrary.common.ecs
             message.Put(0f);
             message.Put(_Camera.Right.Z);
             message.Put(Elevation);
-            
+
             message.Put(Fly);
             if (VoxPopuliLibrary.client.network.Network.Server != null)
             {
@@ -189,18 +193,18 @@ namespace VoxPopuliLibrary.common.ecs
         }
         internal void RenderPlayerUtils()
         {
-            if(BlockIsSec)
+            if (BlockIsSec)
             {
-                RenderSystem.RenderDebugBox(GlobalVariable.BlockSelectionBox, new Vector3(BlockSePos.X-0.125f, BlockSePos.Y - 0.125f, BlockSePos.Z -0.125f));
+                RenderSystem.RenderDebugBox(GlobalVariable.BlockSelectionBox, new Vector3(BlockSePos.X - 0.125f, BlockSePos.Y - 0.125f, BlockSePos.Z - 0.125f));
             }
-            
+
         }
         internal void Render()
         {
             GL.BindVertexArray(_Model.Vao);
             _Model.Texture.Use(TextureUnit.Texture0);
             _Model._Shader.Use();
-            var model = Matrix4.Identity * Matrix4.CreateTranslation((Vector3)Position) * Matrix4.CreateRotationY(Rotation.Y);
+            var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y+EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
             _Model._Shader.SetMatrix4("model", model);
             _Model._Shader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
             _Model._Shader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
@@ -270,6 +274,6 @@ namespace VoxPopuliLibrary.common.ecs
             message.Put(Rotation.Z);
             VoxPopuliLibrary.server.network.Network.server.SendToAll(message, DeliveryMethod.ReliableUnordered);
         }
-        
+
     }
 }

@@ -1,9 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using System.Diagnostics;
 using VoxPopuliLibrary.common.ecs.server;
 using VoxPopuliLibrary.common.network;
-using VoxPopuliLibrary.common.voxel.common;
 using VoxPopuliLibrary.common.voxel.server;
 
 namespace VoxPopuliLibrary.server.network
@@ -14,13 +12,13 @@ namespace VoxPopuliLibrary.server.network
         internal static NetManager server;
         internal static readonly NetPacketProcessor _netPacketProcessor = new NetPacketProcessor();
 
-        static internal void StartServer(int Port)
+        internal static void StartServer(int Port)
         {
             message = new NetDataWriter();
             EventBasedNetListener listener = new EventBasedNetListener();
             server = new NetManager(listener);
             server.DisconnectTimeout = 60000;
-            
+
 
             listener.ConnectionRequestEvent += request =>
             {
@@ -30,6 +28,8 @@ namespace VoxPopuliLibrary.server.network
             {
                 Console.WriteLine("A player was connectected: {0}", peer.EndPoint); // Show peer ip
                 PlayerFactory.AddPlayer(((ushort)peer.Id), peer);       // Send with reliability
+                SendVersion(peer);
+
             };
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
@@ -46,7 +46,7 @@ namespace VoxPopuliLibrary.server.network
                         PlayerFactory.HandleControl(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.PlayerClientSendPos:
-                        PlayerFactory.HandlePos(dataReader,fromPeer);
+                        PlayerFactory.HandlePos(dataReader, fromPeer);
                         break;
                     default:
                         // handle unknown value
@@ -64,6 +64,13 @@ namespace VoxPopuliLibrary.server.network
         internal static void Update()
         {
             server.PollEvents();
+        }
+        internal static void SendVersion(NetPeer peer)
+        {
+            NetDataWriter message = new NetDataWriter();
+            message.Put(Convert.ToUInt16(NetworkProtocol.ServerVersionSend));
+            message.Put(common.Version.VersionNumber);
+            peer.Send(message, DeliveryMethod.ReliableOrdered);
         }
     }
 }

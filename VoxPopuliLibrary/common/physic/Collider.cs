@@ -1,11 +1,11 @@
 ﻿using OpenTK.Mathematics;
 namespace VoxPopuliLibrary.common.physic
 {
-    internal class Collider 
+    internal class Collider
     {
         internal float x1, y1, z1;
         internal float x2, y2, z2;
-        internal Collider(Vector3 pos1= default,Vector3 pos2 =default)
+        internal Collider(Vector3 pos1 = default, Vector3 pos2 = default)
         {
             x1 = pos1.X;
             y1 = pos1.Y;
@@ -21,12 +21,12 @@ namespace VoxPopuliLibrary.common.physic
             && (Math.Min(z2, other.z2) - Math.Max(z1, other.z1) > 0);
 
         }
-  
-        internal  float Time( float x, float y)
+
+        internal float Time(float x, float y)
         {
             if (y == 0f)
             {
-                return x > 0 ? float.NegativeInfinity:  float.PositiveInfinity;
+                return x > 0 ? float.NegativeInfinity : float.PositiveInfinity;
             }
             else
             {
@@ -48,14 +48,14 @@ namespace VoxPopuliLibrary.common.physic
 
             if (x_entry < 0 && y_entry < 0 && z_entry < 0)
             {
-                return (null,Vector3.Zero);
+                return (null, Vector3.Zero);
             }
 
             if (x_entry > 1 || y_entry > 1 || z_entry > 1)
             {
-                return (null,Vector3.Zero);
+                return (null, Vector3.Zero);
             }
-            
+
             float entry = Math.Max(Math.Max(x_entry, y_entry), z_entry);
             float exit_ = Math.Min(Math.Min(x_exit, y_exit), z_exit);
             //Console.WriteLine(entry + " " + exit_);
@@ -66,7 +66,7 @@ namespace VoxPopuliLibrary.common.physic
             Vector3 normal = Vector3.Zero;
             if (entry == x_entry)
             {
-                normal = new Vector3(vx > 0 ? -1:1, 0, 0);
+                normal = new Vector3(vx > 0 ? -1 : 1, 0, 0);
             }
             else if (entry == y_entry)
             {
@@ -84,7 +84,7 @@ namespace VoxPopuliLibrary.common.physic
             float x = pos.X;
             float y = pos.Y;
             float z = pos.Z;
-            return new Collider(new Vector3(this.x1 + x, this.y1 + y, this.z1 + z),new Vector3(this.x2 + x, this.y2 + y, this.z2 + z));
+            return new Collider(new Vector3(this.x1 + x, this.y1 + y, this.z1 + z), new Vector3(this.x2 + x, this.y2 + y, this.z2 + z));
         }
     }
 }

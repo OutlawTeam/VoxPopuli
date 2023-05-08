@@ -6,7 +6,6 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
-using VoxPopuliLibrary.server.program;
 using VoxPopuliLibrary.server.network;
 namespace VoxPopuliLibrary.common.ecs.server
 {
@@ -15,7 +14,7 @@ namespace VoxPopuliLibrary.common.ecs.server
         internal static Dictionary<ushort, Player> List = new Dictionary<ushort, Player>();
         internal static void AddPlayer(ushort clientId, NetPeer peer)
         {
-            Player temp = new Player(new Vector3d(0, 302, 0),clientId,false,false);
+            Player temp = new Player(new Vector3d(0, 302, 0), clientId, false, false);
             foreach (Player otherPlayer in List.Values)
             {
                 if (otherPlayer.ClientID != peer.Id)
@@ -71,7 +70,7 @@ namespace VoxPopuliLibrary.common.ecs.server
         }
         internal static void Update(float DT)
         {
-            foreach(Player player in List.Values)
+            foreach (Player player in List.Values)
             {
                 player.UpdateServer(DT);
             }
@@ -83,7 +82,7 @@ namespace VoxPopuliLibrary.common.ecs.server
                 player.SendData();
             }
         }
-        
+
         internal static void HandleControl(NetDataReader data, NetPeer peer)
         {
             if (List.TryGetValue((ushort)peer.Id, out Player player))
@@ -94,10 +93,10 @@ namespace VoxPopuliLibrary.common.ecs.server
                 player.left = data.GetBool();
                 player.space = data.GetBool();
                 player.shift = data.GetBool();
-                player.Rotation =new Vector3( data.GetFloat(), data.GetFloat(), data.GetFloat());
+                player.Rotation = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
                 player.Front = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
                 player.Right = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
-                player.Elevation =data.GetFloat();
+                player.Elevation = data.GetFloat();
                 player.Fly = data.GetBool();
             }
         }
@@ -105,7 +104,7 @@ namespace VoxPopuliLibrary.common.ecs.server
         {
             if (List.TryGetValue((ushort)peer.Id, out Player player))
             {
-                player.Position = new Vector3d(data.GetDouble(),data.GetDouble(),data.GetDouble());
+                player.Position = new Vector3d(data.GetDouble(), data.GetDouble(), data.GetDouble());
             }
         }
     }

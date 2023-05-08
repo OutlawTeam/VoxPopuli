@@ -13,7 +13,7 @@ namespace VoxPopuliLibrary.server.program
 {
     public static class Program
     {
-        
+
         internal static string Title = @"
          __      __       _____                  _ _    _____                          
          \ \    / /      |  __ \                | (_)  / ____|                         
@@ -33,7 +33,7 @@ namespace VoxPopuliLibrary.server.program
         ";
         public static void Main()
         {
-            Console.SetWindowSize(100,25);
+            Console.SetWindowSize(100, 25);
             Console.WriteLine(Title);
             Console.WriteLine(Author);
             Console.WriteLine("The standalone server starts is initialization");
@@ -52,16 +52,18 @@ namespace VoxPopuliLibrary.server.program
             Console.WriteLine("Blocks has been Initialize");
             GlobalVariable.LoadServer();
             Console.WriteLine("Settings has been Initialize");
-            Network.StartServer(23482);
+            /*Modifie pour l'instant origianal 23482*/
+            Network.StartServer(23483);
             Console.WriteLine("Network has been Initialized");
 
-            Console.WriteLine("The server has finished initializing, it is now ready at: "+Network.server.LocalPort);
+            Console.WriteLine("The server has finished initializing, it is now ready at: " + Network.server.LocalPort);
+            Console.WriteLine("Server game version: " + common.Version.VersionNumber);
 
             // end
 
             var frameWatch = Stopwatch.StartNew();
             var LowUpdate = Stopwatch.StartNew();
-            float dt = 1f/60f;
+            float dt = 1f / 60f;
             while (true)
             {
                 Network.Update();

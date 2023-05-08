@@ -4,6 +4,7 @@
  * Author Florian Pfeiffer
  * */
 using LiteNetLib;
+using LiteNetLib.Utils;
 using VoxPopuliLibrary.common.ecs.client;
 using VoxPopuliLibrary.common.network;
 using VoxPopuliLibrary.common.voxel.client;
@@ -19,6 +20,7 @@ namespace VoxPopuliLibrary.client.network
         public static int id;
         //Server peer
         public static NetPeer Server;
+        public static string ServerVersion = "NotConnected";
 
         internal static void ServerDisconnectSequence()
         {
@@ -37,9 +39,9 @@ namespace VoxPopuliLibrary.client.network
             client.Start();
             listener.PeerConnectedEvent += (server) =>
             {
-               Server =server;
+                Server = server;
             };
-            
+
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
 
@@ -64,6 +66,9 @@ namespace VoxPopuliLibrary.client.network
                     case NetworkProtocol.PlayerLocal:
                         PlayerFactory.AddLocalPlayer(dataReader, fromPeer);
                         break;
+                    case NetworkProtocol.ServerVersionSend:
+                        HandleVersion(dataReader,fromPeer);
+                        break;
                     default:
                         // handle unknown value
                         break;
@@ -71,17 +76,21 @@ namespace VoxPopuliLibrary.client.network
                 dataReader.Recycle();
             };
         }
+        internal static void HandleVersion(NetDataReader data, NetPeer peer)
+        {
+            ServerVersion = data.GetString();
+        }
         /// <summary>
         /// Connect the client to the server
         /// </summary>
         /// <param name="ip">Ip of the Server</param>
-        public static void Connect(string ip,int port)
+        public static void Connect(string ip, int port)
         {
             client.Connect(ip, port, "");
         }
         public static void DeConnect()
         {
-            if(Server != null)
+            if (Server != null)
             {
                 Server.Disconnect();
             }

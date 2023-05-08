@@ -10,9 +10,9 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
 using VoxPopuliLibrary.client.debug;
-using VoxPopuliLibrary.client.graphic;
 using VoxPopuliLibrary.client.graphic.renderer;
 using VoxPopuliLibrary.common.ecs.client;
+using VoxPopuliLibrary.common.voxel.client;
 
 namespace VoxPopuliLibrary.client
 {
@@ -34,7 +34,6 @@ namespace VoxPopuliLibrary.client
         protected override void OnLoad()
         {
             base.OnLoad();
-           
             DebugSystem.Init(ClientSize);
             RenderSystem.Init(this);
             GlobalVariable.LoadClient();
@@ -73,12 +72,12 @@ namespace VoxPopuliLibrary.client
             base.OnUpdateFrame(e);
             if (PlayerFactory.LocalPlayerExist)
             {
-                common.voxel.client.Chunk_Manager.Update(GlobalVariable._shader, PlayerFactory.LocalPlayer.Position);
+                common.voxel.client.Chunk_Manager.Update(PlayerFactory.LocalPlayer.Position);
             }
             network.Network.Update();
             var input = KeyboardState;
             var mouse = MouseState;
-            PlayerFactory.Update((float)e.Time, KeyboardState,MouseState);
+            PlayerFactory.Update((float)e.Time, KeyboardState, MouseState);
             if (input.IsKeyPressed(Keys.Escape))
             {
                 if (Grabed == false)

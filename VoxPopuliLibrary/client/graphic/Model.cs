@@ -7,7 +7,7 @@ namespace VoxPopuliLibrary.client.graphic
         internal Texture Texture;
         internal Shader _Shader;
         internal float[] _Vertices;
-        public Model(float[] Vertices,Texture texture,Shader shader)
+        public Model(float[] Vertices, Texture texture, Shader shader)
         {
             _Vertices = Vertices;
             Texture = texture;

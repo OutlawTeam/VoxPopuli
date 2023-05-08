@@ -5,10 +5,8 @@
  */
 using LiteNetLib;
 using LiteNetLib.Utils;
-using OpenTK.Graphics.ES11;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VoxPopuliLibrary.common.ecs.client
 {
@@ -17,27 +15,28 @@ namespace VoxPopuliLibrary.common.ecs.client
         internal static readonly Dictionary<ushort, Player> PlayerList = new Dictionary<ushort, Player>();
         internal static Player LocalPlayer;
         internal static bool LocalPlayerExist = false;
-        internal static void AddPlayer(ushort clientId, Vector3d position,bool Local)
+        internal static void AddPlayer(ushort clientId, Vector3d position, bool Local)
         {
-            Player temp = new Player(position, clientId, Local,true);
-            if(Local)
+            Player temp = new Player(position, clientId, Local, true);
+            if (Local)
             {
                 LocalPlayer = temp;
                 LocalPlayerExist = true;
             }
             PlayerList.Add(clientId, temp);
         }
-        internal static void Update(float DT , KeyboardState Keyboard,MouseState Mouse) 
+        internal static void Update(float DT, KeyboardState Keyboard, MouseState Mouse)
         {
-            if(LocalPlayerExist){
+            if (LocalPlayerExist)
+            {
                 LocalPlayer.UpdateClient(DT, Keyboard, Mouse);
             }
         }
         internal static void Render()
         {
-            foreach(var player in PlayerList.Values)
+            foreach (var player in PlayerList.Values)
             {
-                if(player != LocalPlayer)
+                if (player != LocalPlayer)
                 {
                     player.Render();
                 }
@@ -47,7 +46,7 @@ namespace VoxPopuliLibrary.common.ecs.client
         {
             ushort id = data.GetUShort();
             Vector3d position = new Vector3d(data.GetDouble(), data.GetDouble(), data.GetDouble());
-            AddPlayer(id, position,false);
+            AddPlayer(id, position, false);
         }
         internal static void AddLocalPlayer(NetDataReader data, NetPeer peer)
         {
@@ -64,7 +63,7 @@ namespace VoxPopuliLibrary.common.ecs.client
                 double y = data.GetDouble();
                 double z = data.GetDouble();
                 Vector3 rotation = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
-                if(player != LocalPlayer)
+                if (player != LocalPlayer)
                 {
                     player.Rotation = rotation;
                 }
@@ -76,6 +75,6 @@ namespace VoxPopuliLibrary.common.ecs.client
             ushort id = data.GetUShort();
             PlayerList.Remove(id);
         }
-        
+
     }
 }
