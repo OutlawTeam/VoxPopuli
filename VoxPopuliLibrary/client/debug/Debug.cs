@@ -33,8 +33,7 @@ namespace VoxPopuliLibrary.client.debug
         static bool WireFrameView;
         //Network debug variable 
         static string ip = "localhost";
-        /* modifié pour lemeoment 23482*/
-        static int port = 23483;
+        static int port = 23482;
         //physic debug variable
         internal static bool ShowAABB;
         //Imgui Controller

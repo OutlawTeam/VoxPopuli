@@ -52,8 +52,7 @@ namespace VoxPopuliLibrary.server.program
             Console.WriteLine("Blocks has been Initialize");
             GlobalVariable.LoadServer();
             Console.WriteLine("Settings has been Initialize");
-            /*Modifie pour l'instant origianal 23482*/
-            Network.StartServer(23483);
+            Network.StartServer(23482);
             Console.WriteLine("Network has been Initialized");
 
             Console.WriteLine("The server has finished initializing, it is now ready at: " + Network.server.LocalPort);
