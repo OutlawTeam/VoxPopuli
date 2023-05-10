@@ -10,6 +10,7 @@ using OpenTK.Mathematics;
 using VoxPopuliLibrary.client;
 using VoxPopuliLibrary.common.ecs;
 using VoxPopuliLibrary.common.ecs.server;
+using VoxPopuliLibrary.common.math;
 using VoxPopuliLibrary.common.utils;
 using VoxPopuliLibrary.common.voxel.common;
 using VoxPopuliLibrary.server.network;
@@ -80,25 +81,30 @@ namespace VoxPopuliLibrary.common.voxel.server
             ChunkToBeAdded.Clear();
             foreach (Chunk chunk in clist.Values)
             {
-                foreach (Player player in PlayerFactory.List.Values)
+                if (chunk.Used = false)
                 {
-                    int minx = (int)(player.Position.X / 16) - GlobalVariable.RenderDistance;
-                    int minz = (int)(player.Position.Z / 16) - GlobalVariable.RenderDistance;
-                    int maxx = (int)(player.Position.X / 16) + GlobalVariable.RenderDistance;
-                    int maxz = (int)(player.Position.Z / 16) + GlobalVariable.RenderDistance;
-                    for (int x = minx; x <= maxx; x++)
+                    clist.Remove(chunk.Position);
+                }
+                chunk.Used = false;
+            }
+            foreach (Player player in PlayerFactory.List.Values)
+            {
+                int minx = (int)(player.Position.X / 16) - GlobalVariable.RenderDistance;
+                int minz = (int)(player.Position.Z / 16) - GlobalVariable.RenderDistance;
+                int maxx = (int)(player.Position.X / 16) + GlobalVariable.RenderDistance;
+                int maxz = (int)(player.Position.Z / 16) + GlobalVariable.RenderDistance;
+                for (int x = minx; x <= maxx; x++)
+                {
+                    for (int z = minz; z <= maxz; z++)
                     {
-                        for (int z = minz; z <= maxz; z++)
+                        if (!clist.TryGetValue(new Vector2i(x, z), out Chunk Nothing))
                         {
-                            if (!clist.TryGetValue(new Vector2i(x, z), out Chunk Nothing))
-                            {
-                                ChunkToBeAdded.Add(new Vector2i(x, z));
-                            }
+                            ChunkToBeAdded.Add(new Vector2i(x, z));
                         }
-                    }
-                    if (!(chunk.Position.X >= minx && chunk.Position.X <= maxx && chunk.Position.Y >= minz && chunk.Position.Y <= maxz))
-                    {
-                        clist.Remove(chunk.Position);
+                        else
+                        {
+                            Nothing.Used = true;
+                        }
                     }
                 }
             }

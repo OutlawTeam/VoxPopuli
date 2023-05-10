@@ -24,6 +24,8 @@ namespace VoxPopuliLibrary.common.voxel.common
         //Chunk data
         //Chunk coordinates
         public Vector2i Position;
+        //
+        internal bool Used = true;
         //Chunk data
         public ushort[] Blocks = new ushort[GlobalVariable.CHUNK_SIZE * GlobalVariable.CHUNK_HEIGHT * GlobalVariable.CHUNK_SIZE];
         /// <summary>

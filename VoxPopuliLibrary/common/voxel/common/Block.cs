@@ -49,56 +49,57 @@ namespace VoxPopuliLibrary.common.voxel.common
         public static Dictionary<int, block> BlockList = new Dictionary<int, block>();
         public static int id = 1;
         public static BlockMesh Cube;
+        internal static Collider CubeColl = new Collider(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
         public static void init()
         {
             Cube = new BlockMesh();
             Cube.Top = new float[]{
-                -0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f,  0.5f,
-                 0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f
+                0f,  1f, 0f,
+                1f,  1f, 0f,
+                1f,  1f, 1f,
+                1f,  1f, 1f,
+                0f,  1f, 1f,
+                0f,  1f, 0f
                 };
             Cube.Bottom = new float[]{
-                -0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f,  0.5f,
-                 0.5f, -0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-                -0.5f, -0.5f, -0.5f
+                0f, 0f, 0f,
+                1f, 0f, 0f,
+                1f, 0f, 1f,
+                1f, 0f, 1f,
+                0f, 0f, 1f,
+                0f, 0f, 0f
                 };
             Cube.Front = new float[] {
-                -0.5f, -0.5f,0.5f,
-                0.5f, -0.5f,0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f,0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f,0.5f
+                0f, 0f, 1f,
+                1f, 0f, 1f,
+                1f, 1f, 1f,
+                1f, 1f, 1f,
+                0f, 1f, 1f,
+                0f, 0f, 1f
             };
             Cube.Back = new float[]{
-                -0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f
+                0f, 0f, 0f,
+                1f, 0f, 0f,
+                1f, 1f, 0f,
+                1f, 1f, 0f,
+                0f, 1f, 0f,
+                0f, 0f, 0f
                 };
             Cube.Right = new float[]{
-                0.5f,  0.5f,  0.5f,
-                0.5f,  0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f
+                1f, 1f, 1f,
+                1f, 1f, 0f,
+                1f, 0f, 0f,
+                1f, 0f, 0f,
+                1f, 0f, 1f,
+                1f, 1f, 1f
                 };
             Cube.Left = new float[]{
-                -0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f
+                0f, 1f, 1f,
+                0f, 1f, 0f,
+                0f, 0f, 0f,
+                0f, 0f, 0f,
+                0f, 0f, 1f,
+                0f, 1f, 1f
                 };
             //dirt
             dirt.texture0 = TextureAtlas.IdtoCord(0);
@@ -110,7 +111,7 @@ namespace VoxPopuliLibrary.common.voxel.common
             dirt.IsTransparent = false;
             dirt.Mesh = Cube;
             dirt.IsSolid = true;
-            dirt.Colliders.Add(new Collider(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f)));
+            dirt.Colliders.Add(CubeColl);
             BlockList.Add(id, dirt);
             id++;
             //grass
@@ -122,7 +123,7 @@ namespace VoxPopuliLibrary.common.voxel.common
             grass.texture5 = TextureAtlas.IdtoCord(0);
             grass.IsTransparent = false;
             grass.Mesh = Cube;
-            grass.Colliders.Add(new Collider(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f)));
+            grass.Colliders.Add(CubeColl);
             BlockList.Add(id, grass);
             id++;
             //cobblestone
@@ -134,7 +135,7 @@ namespace VoxPopuliLibrary.common.voxel.common
             cobblestone.texture5 = TextureAtlas.IdtoCord(3);
             cobblestone.IsTransparent = false;
             cobblestone.Mesh = Cube;
-            cobblestone.Colliders.Add(new Collider(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f)));
+            cobblestone.Colliders.Add(CubeColl);
             BlockList.Add(id, cobblestone);
             id++;
         }
