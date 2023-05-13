@@ -25,11 +25,11 @@ namespace VoxPopuliLibrary.common.ecs.client
             }
             PlayerList.Add(clientId, temp);
         }
-        internal static void Update(float DT, KeyboardState Keyboard, MouseState Mouse)
+        internal static void Update(float DT, KeyboardState Keyboard, MouseState Mouse,bool Grabed)
         {
             if (LocalPlayerExist)
             {
-                LocalPlayer.UpdateClient(DT, Keyboard, Mouse);
+                LocalPlayer.UpdateClient(DT, Keyboard, Mouse,Grabed);
             }
         }
         internal static void Render()

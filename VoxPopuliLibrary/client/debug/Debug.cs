@@ -7,7 +7,6 @@ using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
-using System.Threading;
 using VoxPopuliLibrary.client.graphic.renderer;
 using VoxPopuliLibrary.common.ecs.client;
 using VoxPopuliLibrary.common.voxel.client;
@@ -52,8 +51,8 @@ namespace VoxPopuliLibrary.client.debug
             ImGui.Text($"Voxpopuli average {1000.0f / framerate:0.##} ms/frame ({framerate:0.#} FPS)");
             ImGui.Separator();
             ImGui.Text("Game Version:");
-            ImGui.Text("Client: "+common.Version.VersionNumber);
-            ImGui.Text("Server: "+network.Network.ServerVersion);
+            ImGui.Text("Client: " + common.Version.VersionNumber);
+            ImGui.Text("Server: " + network.Network.ServerVersion);
 
             if (ImGui.Button("Entity Menu"))
                 EntityMenu = true;
@@ -140,16 +139,14 @@ namespace VoxPopuliLibrary.client.debug
             {
                 VoxelMenu = false;
             }
-            ImGui.Text($"Number of chunk: {VoxPopuliLibrary.common.voxel.client.Chunk_Manager.Clist.Count}");
+            ImGui.Text($"Number of chunk: {ChunkManager.Clist.Count}");
             ImGui.SliderInt("Render Distance:", ref GlobalVariable.RenderDistance, 2, 32);
             ImGui.InputInt("Block x:", ref bx);
             ImGui.InputInt("Block y:", ref by);
             ImGui.InputInt("Block z:", ref bz);
             ImGui.InputInt("Replace block id:", ref blockid);
             if (ImGui.Button("Send chunk modification"))
-                Chunk_Manager.ChangeChunk(new Vector3i(bx, by, bz), (ushort)blockid);
-            ImGui.Separator();
-            ImGui.InputInt("Number of max thread for generate mesh",ref GlobalVariable.maxThreads);
+                ChunkManager.ChangeChunk(new Vector3i(bx, by, bz), (ushort)blockid);
             ImGui.Separator();
             ImGui.Checkbox("ChunkDebug", ref DebugChunk);
 
@@ -229,7 +226,7 @@ namespace VoxPopuliLibrary.client.debug
             }
             if (DebugChunk)
             {
-                foreach (Chunk ch in Chunk_Manager.Clist.Values)
+                foreach (Chunk ch in ChunkManager.Clist.Values)
                 {
                     RenderSystem.RenderDebugBox(ChunkBox, new Vector3(ch.Position.X * 16, 0, ch.Position.Y * 16));
                 }

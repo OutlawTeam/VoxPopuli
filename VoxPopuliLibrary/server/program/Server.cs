@@ -48,7 +48,7 @@ namespace VoxPopuliLibrary.server.program
                                                                   |_|              
             */
 
-            AllBlock.init();
+            BlockManager.init();
             Console.WriteLine("Blocks has been Initialize");
             GlobalVariable.LoadServer();
             Console.WriteLine("Settings has been Initialize");
@@ -69,9 +69,9 @@ namespace VoxPopuliLibrary.server.program
 
                 PlayerFactory.Update(dt);
 
-                Chunk_Manager.Update();
+                ChunkManager.Update();
 
-                if (LowUpdate.ElapsedMilliseconds > 0.02)
+                if (LowUpdate.ElapsedMilliseconds > 16)
                 {
                     PlayerFactory.SendData();
                     LowUpdate.Restart();

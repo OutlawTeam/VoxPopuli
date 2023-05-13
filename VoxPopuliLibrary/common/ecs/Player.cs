@@ -47,12 +47,12 @@ namespace VoxPopuliLibrary.common.ecs
                 {
                     _Camera = new Camera((Vector3)_Position, 16 / 9);
                 }
-                _Model = new Model(vertices, GlobalVariable._playertexture, GlobalVariable._shader);
+                _Model = new Model(vertices, GlobalVariable._playertexture, GlobalVariable.EntityShader);
             }
             ClientID = _ClientID;
         }
         //Client
-        internal new void UpdateClient(float DT, KeyboardState Keyboard, MouseState Mouse)
+        internal new void UpdateClient(float DT, KeyboardState Keyboard, MouseState Mouse,bool Grabed)
         {
             base.UpdateClient(DT);
 
@@ -125,24 +125,27 @@ namespace VoxPopuliLibrary.common.ecs
             {
                 shift = false;
             }
-            if (_firstMove) // This bool variable is initially set to true.
+            if(Grabed)
             {
-                _lastPos = new Vector2(Mouse.X, Mouse.Y);
-                _firstMove = false;
-            }
-            else
-            {
-                // Calculate the offset of the mouse position
-                var deltaX = Mouse.X - _lastPos.X;
-                var deltaY = Mouse.Y - _lastPos.Y;
+                if (_firstMove) // This bool variable is initially set to true.
+                {
+                    _lastPos = new Vector2(Mouse.X, Mouse.Y);
+                    _firstMove = false;
+                }
+                else
+                {
+                    // Calculate the offset of the mouse position
+                    var deltaX = Mouse.X - _lastPos.X;
+                    var deltaY = Mouse.Y - _lastPos.Y;
 
 
-                _lastPos = new Vector2(Mouse.X, Mouse.Y);
-                // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
-                _Camera.Yaw += deltaX * sensitivity;
-                _Camera.Pitch -= deltaY * sensitivity; // Reversed since y-coordinates range from bottom to top
-                Rotation.X = _Camera.Yaw;
-                Rotation.Y = _Camera.Pitch;
+                    _lastPos = new Vector2(Mouse.X, Mouse.Y);
+                    // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
+                    _Camera.Yaw += deltaX * sensitivity;
+                    _Camera.Pitch -= deltaY * sensitivity; // Reversed since y-coordinates range from bottom to top
+                    Rotation.X = _Camera.Yaw;
+                    Rotation.Y = _Camera.Pitch;
+                }
             }
             Elevation = (float)Math.Abs(Math.Acos(_Camera.Front.Y));
             Front = new Vector3(_Camera.Front.X, 0, _Camera.Front.Z);
@@ -204,7 +207,7 @@ namespace VoxPopuliLibrary.common.ecs
             GL.BindVertexArray(_Model.Vao);
             _Model.Texture.Use(TextureUnit.Texture0);
             _Model._Shader.Use();
-            var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y+EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
+            var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
             _Model._Shader.SetMatrix4("model", model);
             _Model._Shader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
             _Model._Shader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());

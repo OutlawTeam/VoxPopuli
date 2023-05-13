@@ -88,29 +88,20 @@ namespace VoxPopuliLibrary.common.ecs
             for (int _ = 0; _ < 3; _++)
             {
                 Vector3 AVel = Velocity * DT;
-
                 float vx = AVel.X;
                 float vy = AVel.Y;
                 float vz = AVel.Z;
-
                 int step_x = vx > 0 ? 1 : -1;
-
                 int step_y = vy > 0 ? 1 : -1;
-
                 int step_z = vz > 0 ? 1 : -1;
-
                 int steps_xz = (int)Math.Ceiling(EntityWidth / 2);
-
                 int steps_y = (int)EntityHeight;
-
                 int x = (int)Math.Floor(Position.X);
                 int y = (int)Math.Floor(Position.Y);
                 int z = (int)Math.Floor(Position.Z);
-
                 int cx = (int)Math.Floor(Position.X + Velocity.X);
                 int cy = (int)Math.Floor(Position.Y + Velocity.Y);
                 int cz = (int)Math.Floor(Position.Z + Velocity.Z);
-                //Console.WriteLine(AVel.ToString());
                 List<Tuple<float?, Vector3>> PossibleCollision = new List<Tuple<float?, Vector3>>();
                 for (int i = x - step_x * (steps_xz + 1); vx > 0 ? i < cx + step_x * (steps_xz + 2) : i > cx + step_x * (steps_xz + 2); i += step_x)
                 {
@@ -118,15 +109,13 @@ namespace VoxPopuliLibrary.common.ecs
                     {
                         for (int k = z - step_z * (steps_xz + 1); vz > 0 ? k < cz + step_z * (steps_xz + 2) : k > cz + step_z * (steps_xz + 2); k += step_z)
                         {
-                            if (Chunk_Manager.GetBlock(i, j, k, out ushort id))
+                            if (ChunkManager.GetBlock(i, j, k, out ushort id))
                             {
                                 if (id != 0)
                                 {
-                                    foreach (Collider collider in AllBlock.BlockList[id].Colliders)
+                                    foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {
-                                        //Console.WriteLine("Block " + i + " : " + j + " : " + k + " id " + id);
                                         (float? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);
-
                                         if (entry_time == null)
                                         {
                                             continue;
@@ -141,9 +130,7 @@ namespace VoxPopuliLibrary.common.ecs
                 }
                 if (PossibleCollision.Count() != 0)
                 {
-                    //Console.WriteLine("Collsion");
                     (float? entry_time, Vector3 normal) = PossibleCollision.OrderBy(x => x.Item1).First();
-
                     entry_time -= 0.001f;
                     if (normal.X != 0)
                     {
@@ -217,11 +204,11 @@ namespace VoxPopuliLibrary.common.ecs
                     {
                         for (int k = z - step_z * (steps_xz + 1); vz > 0 ? k < cz + step_z * (steps_xz + 2) : k > cz + step_z * (steps_xz + 2); k += step_z)
                         {
-                            if (voxel.server.Chunk_Manager.GetBlock(i, j, k, out ushort id))
+                            if (voxel.server.ChunkManager.GetBlock(i, j, k, out ushort id))
                             {
                                 if (id != 0)
                                 {
-                                    foreach (Collider collider in AllBlock.BlockList[id].Colliders)
+                                    foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {
                                         //Console.WriteLine("Block " + i + " : " + j + " : " + k + " id " + id);
                                         (float? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);

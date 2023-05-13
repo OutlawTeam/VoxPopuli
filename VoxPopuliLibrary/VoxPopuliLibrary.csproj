@@ -31,4 +31,9 @@
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="common\ressource\client\" />
+    <Folder Include="common\ressource\server\" />
+  </ItemGroup>
+
 </Project>

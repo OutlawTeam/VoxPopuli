@@ -12,7 +12,6 @@ using System.Diagnostics;
 using VoxPopuliLibrary.client.debug;
 using VoxPopuliLibrary.client.graphic.renderer;
 using VoxPopuliLibrary.common.ecs.client;
-using VoxPopuliLibrary.common.voxel.client;
 
 namespace VoxPopuliLibrary.client
 {
@@ -39,20 +38,24 @@ namespace VoxPopuliLibrary.client
             GlobalVariable.LoadClient();
             network.Network.Init();
             network.Network.Update();
-            common.voxel.common.AllBlock.init();
+            common.voxel.common.BlockManager.init();
+            SkyboxRender.InitSkyBox();
             updateTimer = new Stopwatch();
             updateTimer.Start();
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             if (PlayerFactory.LocalPlayerExist)
             {
-                GlobalVariable._shader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
-                GlobalVariable._shader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
-                common.voxel.client.Chunk_Manager.RenderChunk((Vector3)PlayerFactory.LocalPlayer.Position);
+                SkyboxRender.RenderSkyBox(PlayerFactory.LocalPlayer._Camera.GetViewMatrix(),
+                    PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix()) ;
+                GlobalVariable.VoxelShader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
+                GlobalVariable.VoxelShader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
+                common.voxel.client.ChunkManager.RenderChunk((Vector3)PlayerFactory.LocalPlayer.Position);
                 PlayerFactory.LocalPlayer.RenderPlayerUtils();
+
             }
             //Entity
             PlayerFactory.Render();
@@ -72,12 +75,12 @@ namespace VoxPopuliLibrary.client
             base.OnUpdateFrame(e);
             if (PlayerFactory.LocalPlayerExist)
             {
-                common.voxel.client.Chunk_Manager.Update(PlayerFactory.LocalPlayer.Position);
+                common.voxel.client.ChunkManager.Update(PlayerFactory.LocalPlayer.Position);
             }
             network.Network.Update();
             var input = KeyboardState;
             var mouse = MouseState;
-            PlayerFactory.Update((float)e.Time, KeyboardState, MouseState);
+            PlayerFactory.Update((float)e.Time, KeyboardState, MouseState,Grabed);
             if (input.IsKeyPressed(Keys.Escape))
             {
                 if (Grabed == false)

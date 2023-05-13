@@ -10,14 +10,13 @@ using OpenTK.Mathematics;
 using VoxPopuliLibrary.client;
 using VoxPopuliLibrary.common.ecs;
 using VoxPopuliLibrary.common.ecs.server;
-using VoxPopuliLibrary.common.math;
 using VoxPopuliLibrary.common.utils;
 using VoxPopuliLibrary.common.voxel.common;
 using VoxPopuliLibrary.server.network;
 
 namespace VoxPopuliLibrary.common.voxel.server
 {
-    public static class Chunk_Manager
+    public static class ChunkManager
     {
         internal static Dictionary<Vector2i, Chunk> clist = new Dictionary<Vector2i, Chunk>();
         internal static List<Vector2i> ChunkToBeAdded = new List<Vector2i>();
@@ -34,13 +33,13 @@ namespace VoxPopuliLibrary.common.voxel.server
             Network.message.Put(data);
             peer.Send(Network.message, DeliveryMethod.ReliableOrdered);
         }
-        public static Chunk CreateChunk(Vector2i pos)
+        internal static Chunk CreateChunk(Vector2i pos)
         {
             tempChunk = new Chunk(pos);
             clist.Add(pos, tempChunk);
             return tempChunk;
         }
-        private static void SendChunkatall(Chunk chunk, Vector2 pos)
+        internal static void SendChunkatall(Chunk chunk, Vector2 pos)
         {
             byte[] data = utils.conintbyte(chunk.Blocks);
             data = LZ4Pickler.Pickle(data);
