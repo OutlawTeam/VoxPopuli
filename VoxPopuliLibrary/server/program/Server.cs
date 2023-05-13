@@ -69,9 +69,9 @@ namespace VoxPopuliLibrary.server.program
 
                 PlayerFactory.Update(dt);
 
-                Chunk_Manager.Update();
+                ChunkManager.Update();
 
-                if (LowUpdate.ElapsedMilliseconds > 0.02)
+                if (LowUpdate.ElapsedMilliseconds > 3)
                 {
                     PlayerFactory.SendData();
                     LowUpdate.Restart();

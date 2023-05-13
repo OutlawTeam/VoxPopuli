@@ -1,84 +1,26 @@
-﻿/**
- * Chunk implementation shared by the clien and the server
- * Copyrights Florian Pfeiffer
- * Author Florian Pfeiffer
- * Information: Séparer les shader pour les chunk et ceux des entités
- */
+﻿using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using VoxPopuliLibrary.client;
-using VoxPopuliLibrary.common.utils;
 using VoxPopuliLibrary.common.voxel.client;
 namespace VoxPopuliLibrary.common.voxel.common
 {
-    public class Chunk
+    internal partial class Chunk
     {
-        //Client chunk mesh buffer
-        private int VAO, VBO;
-        //Temp mesh float data
-        private List<float> Vertice;
-        //Chunk mesh vertices count
-        public int VerticeCount = 0;
-        //Chunk state for meshing
-        public bool Changed = true;
-        //Chunk data
-        //Chunk coordinates
-        public Vector2i Position;
-        //
-        internal bool Used = true;
-        //Chunk data
-        public ushort[] Blocks = new ushort[GlobalVariable.CHUNK_SIZE * GlobalVariable.CHUNK_HEIGHT * GlobalVariable.CHUNK_SIZE];
-        /// <summary>
-        /// Générate chunk for server
-        /// </summary>
-        /// <param name="Pos">Chunk position</param>
-        public Chunk(Vector2i Pos)
+        internal void Render()
         {
-            Position = Pos;
-            for (int j = 0; j < GlobalVariable.CHUNK_HEIGHT; j++)
-            {
-                for (int i = 0; i < GlobalVariable.CHUNK_SIZE; i++)
-                {
-                    for (int k = 0; k < GlobalVariable.CHUNK_SIZE; k++)
-                    {
-
-                        if (j > 300)
-                        {
-                            Blocks[carray.treedto1d(i, j, k)] = 0;
-                        }
-                        else if (j == 300)
-                        {
-
-                            Blocks[carray.treedto1d(i, j, k)] = 1;
-                        }
-                        else if (j < 300 && j > 275)
-                        {
-                            Blocks[carray.treedto1d(i, j, k)] = 1;
-                        }
-                        else
-                        {
-                            Blocks[carray.treedto1d(i, j, k)] = 3;
-                        }
-                        //m_block[carray.treedto1d(i, j, k)] = 1;
-                    }
-                }
-            }
+            GL.BindVertexArray(VAO);
+            GlobalVariable._texture.Use(TextureUnit.Texture0);
+            var model = Matrix4.CreateTranslation(new Vector3(Position.X * 16, 0, Position.Y * 16));
+            GlobalVariable.VoxelShader.SetMatrix4("model", model);
+            GlobalVariable.VoxelShader.Use();
+            GL.DrawArrays(PrimitiveType.Triangles, 0, VerticeCount);
+            GL.BindVertexArray(0);
         }
-        /// <summary>
-        /// Create chunk with receved chunk data for client
-        /// </summary>
-        /// <param name="blocks">Blocks data</param>
-        /// <param name="Pos">Position</param>
-        public Chunk(ushort[] blocks, Vector2i Pos)
+        internal void InitGraphic()
         {
-            Blocks = blocks;
-            Position = Pos;
             VAO = GL.GenVertexArray();
             VBO = GL.GenBuffer();
         }
-        /// <summary>
-        /// Generate chunk mesh for client
-        /// </summary>
         public void GenerateMesh()
         {
             Vertice = new List<float>();
@@ -137,7 +79,7 @@ namespace VoxPopuliLibrary.common.voxel.common
             {
                 if (z == GlobalVariable.CHUNK_SIZE - 1)
                 {
-                    if (AllBlock.BlockTransparent(Chunk_Manager.getchunk(Position.X, Position.Y + 1).GetBlock(x, y, 0)))
+                    if (AllBlock.BlockTransparent(ChunkManager.getchunk(Position.X, Position.Y + 1).GetBlock(x, y, 0)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 2);
                     }
@@ -151,7 +93,7 @@ namespace VoxPopuliLibrary.common.voxel.common
                 }
                 if (z == 0)
                 {
-                    if (AllBlock.BlockTransparent(Chunk_Manager.getchunk(Position.X, Position.Y - 1).GetBlock(x, y, GlobalVariable.CHUNK_SIZE - 1)))
+                    if (AllBlock.BlockTransparent(ChunkManager.getchunk(Position.X, Position.Y - 1).GetBlock(x, y, GlobalVariable.CHUNK_SIZE - 1)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 3);
                     }
@@ -168,7 +110,7 @@ namespace VoxPopuliLibrary.common.voxel.common
             {
                 if (x == GlobalVariable.CHUNK_SIZE - 1)
                 {
-                    if (AllBlock.BlockTransparent(Chunk_Manager.getchunk(Position.X + 1, Position.Y).GetBlock(0, y, z)))
+                    if (AllBlock.BlockTransparent(ChunkManager.getchunk(Position.X + 1, Position.Y).GetBlock(0, y, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 4);
                     }
@@ -182,7 +124,7 @@ namespace VoxPopuliLibrary.common.voxel.common
                 }
                 if (x == 0)
                 {
-                    if (AllBlock.BlockTransparent(Chunk_Manager.getchunk(Position.X - 1, Position.Y).GetBlock(GlobalVariable.CHUNK_SIZE - 1, y, z)))
+                    if (AllBlock.BlockTransparent(ChunkManager.getchunk(Position.X - 1, Position.Y).GetBlock(GlobalVariable.CHUNK_SIZE - 1, y, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 5);
                     }
@@ -226,57 +168,13 @@ namespace VoxPopuliLibrary.common.voxel.common
             GL.BindVertexArray(VAO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * sizeof(float), Vertices, BufferUsageHint.StaticDraw);
-            var vertexLocation = GlobalVariable._shader.GetAttribLocation("aPosition");
+            var vertexLocation = GlobalVariable.VoxelShader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
-            var texCoordLocation = GlobalVariable._shader.GetAttribLocation("aTexCoord");
+            var texCoordLocation = GlobalVariable.VoxelShader.GetAttribLocation("aTexCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
             GL.BindVertexArray(0);
         }
-        /// <summary>
-        /// Return the block id of the donate coordinate
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y">Y coordinate</param>
-        /// <param name="z">Z coordinate</param>
-        /// <returns>Block id</returns>
-        internal ushort GetBlock(int x, int y, int z)
-        {
-            try
-            {
-                return Blocks[carray.treedto1d(x, y, z)];
-            }
-            catch
-            {
-                Console.WriteLine(x + ":" + y + ":" + z);
-                throw new Exception("Block coordinate was supperior to chunk size and height.");
-            }
-        }
-        /// <summary>
-        /// Set block id at donate coordinate
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y">Y coordinate</param>
-        /// <param name="z">Z coordinate</param>
-        /// <param name="id">Block id of the new block</param>
-        internal void SetBlock(int x, int y, int z, ushort id)
-        {
-            Blocks[x + GlobalVariable.CHUNK_SIZE * (y + GlobalVariable.CHUNK_HEIGHT * z)] = id;
-        }
-        /// <summary>
-        /// Render chunk 
-        /// </summary>
-        public void Render()
-        {
-            GL.BindVertexArray(VAO);
-            GlobalVariable._texture.Use(TextureUnit.Texture0);
-            var model = Matrix4.Identity;
-            model = Matrix4.CreateTranslation(new Vector3(Position.X * 16, 0, Position.Y * 16));
-            GlobalVariable._shader.SetMatrix4("model", model);
-            GlobalVariable._shader.Use();
-            GL.DrawArrays(PrimitiveType.Triangles, 0, VerticeCount);
-            GL.BindVertexArray(0);
-        }
-    };
+    }
 }

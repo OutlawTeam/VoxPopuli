@@ -7,27 +7,26 @@ using K4os.Compression.LZ4;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
-using System.Collections.Concurrent;
-using System.ComponentModel.Design;
-using System.Net.Sockets;
 using VoxPopuliLibrary.client;
-using VoxPopuliLibrary.client.graphic;
 using VoxPopuliLibrary.common.ecs;
 using VoxPopuliLibrary.common.ecs.client;
 using VoxPopuliLibrary.common.voxel.common;
 
 namespace VoxPopuliLibrary.common.voxel.client
 {
-    internal static class Chunk_Manager
+    internal static class ChunkManager
     {
         internal static Dictionary<Vector2i, Chunk> Clist = new Dictionary<Vector2i, Chunk>();
-       /* internal static ConcurrentQueue<Chunk> ChunkMeshToGenerate = new ConcurrentQueue<Chunk>();
-       
-        private static int numThreads = 0; // nombre actuel de threads en cours d'exécution
-        private static object threadLock = new object(); // verrou pour gérer l'accès à numThreads
-        private static Thread[] threads;*/
+        /* internal static ConcurrentQueue<Chunk> ChunkMeshToGenerate = new ConcurrentQueue<Chunk>();
+
+         private static int numThreads = 0; // nombre actuel de threads en cours d'exécution
+         private static object threadLock = new object(); // verrou pour gérer l'accès à numThreads
+         private static Thread[] threads;*/
+        internal static int ChPF = 0;
+        internal static int ChG= 0;
         internal static void Update(Vector3d pos)
         {
+            ChG = 0;
             GetChunk(pos);
             GenerateChunksMesh();
         }
@@ -78,24 +77,29 @@ namespace VoxPopuliLibrary.common.voxel.client
 
                     if (!(chunk.Position.X >= minx && chunk.Position.X <= maxx && chunk.Position.Y >= minz && chunk.Position.Y <= maxz))
                     {
-                        Clist.Remove(chunk.Position ,out Chunk nothing);
+                        Clist.Remove(chunk.Position, out Chunk nothing);
                     }
                 }
             }
         }
-        static internal void GenerateChunksMesh()
+        internal static void GenerateChunksMesh()
         {
-            foreach(Chunk chunk in Clist.Values)
+            foreach (Chunk chunk in Clist.Values)
             {
-                if (chunk.Changed == true && Clist.ContainsKey(new Vector2i(chunk.Position.X + 1, chunk.Position.Y)) &&
-                    Clist.ContainsKey(new Vector2i(chunk.Position.X - 1, chunk.Position.Y)) && 
-                        
+                if(ChG <= ChPF)
+                {
+                    if (chunk.Changed == true && Clist.ContainsKey(new Vector2i(chunk.Position.X + 1, chunk.Position.Y)) &&
+                    Clist.ContainsKey(new Vector2i(chunk.Position.X - 1, chunk.Position.Y)) &&
+
                     Clist.ContainsKey(new Vector2i(chunk.Position.X, chunk.Position.Y + 1)) &&
                     Clist.ContainsKey(new Vector2i(chunk.Position.X, chunk.Position.Y - 1)))
 
-                {
-                    chunk.GenerateMesh();
+                    {
+                        chunk.GenerateMesh();
+                        ChG += 1;
+                    }
                 }
+                
                 //AddChunkToQueue(chunk);
             }/*
             while (ChunkMeshToGenerate.Count > 0 && numThreads < GlobalVariable.maxThreads)

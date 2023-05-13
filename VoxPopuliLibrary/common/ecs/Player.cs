@@ -47,7 +47,7 @@ namespace VoxPopuliLibrary.common.ecs
                 {
                     _Camera = new Camera((Vector3)_Position, 16 / 9);
                 }
-                _Model = new Model(vertices, GlobalVariable._playertexture, GlobalVariable._shader);
+                _Model = new Model(vertices, GlobalVariable._playertexture, GlobalVariable.EntityShader);
             }
             ClientID = _ClientID;
         }
@@ -204,7 +204,7 @@ namespace VoxPopuliLibrary.common.ecs
             GL.BindVertexArray(_Model.Vao);
             _Model.Texture.Use(TextureUnit.Texture0);
             _Model._Shader.Use();
-            var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y+EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
+            var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
             _Model._Shader.SetMatrix4("model", model);
             _Model._Shader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
             _Model._Shader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());

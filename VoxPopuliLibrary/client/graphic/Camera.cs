@@ -92,7 +92,7 @@ namespace VoxPopuliLibrary.client.graphic
         // Get the projection matrix using the same method we have used up until this point
         public Matrix4 GetProjectionMatrix()
         {
-            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.1f, 600f);
+            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.1f, 1024f);
         }
 
         // This function is going to update the direction vertices using some of the math learned in the web tutorials.

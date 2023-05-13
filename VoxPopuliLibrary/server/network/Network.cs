@@ -37,10 +37,10 @@ namespace VoxPopuliLibrary.server.network
                 switch ((NetworkProtocol)messageType)
                 {
                     case NetworkProtocol.ChunkDemand:
-                        Chunk_Manager.HandleChunk(dataReader, fromPeer);
+                        ChunkManager.HandleChunk(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.ChunkOneBlockChangeDemand:
-                        Chunk_Manager.HandleBlockChange(dataReader, fromPeer);
+                        ChunkManager.HandleBlockChange(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.PlayerSendControl:
                         PlayerFactory.HandleControl(dataReader, fromPeer);

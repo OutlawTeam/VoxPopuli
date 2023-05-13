@@ -27,7 +27,7 @@ namespace VoxPopuliLibrary.client.network
             PlayerFactory.LocalPlayer = default;
             PlayerFactory.LocalPlayerExist = false;
             PlayerFactory.PlayerList.Clear();
-            Chunk_Manager.ClearAllChunk();
+            ChunkManager.ClearAllChunk();
         }
 
         /// <summary>
@@ -49,13 +49,13 @@ namespace VoxPopuliLibrary.client.network
                 switch ((NetworkProtocol)messageType)
                 {
                     case NetworkProtocol.ChunkData:
-                        Chunk_Manager.HandleChunk(dataReader, fromPeer);
+                        ChunkManager.HandleChunk(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.PlayerSpawnToClient:
                         PlayerFactory.HandleSpawn(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.ChunkOneBlockChange:
-                        Chunk_Manager.HandleChunkUpdate(dataReader, fromPeer);
+                        ChunkManager.HandleChunkUpdate(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.PlayerPosition:
                         PlayerFactory.HandleData(dataReader, fromPeer);
@@ -67,7 +67,7 @@ namespace VoxPopuliLibrary.client.network
                         PlayerFactory.AddLocalPlayer(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.ServerVersionSend:
-                        HandleVersion(dataReader,fromPeer);
+                        HandleVersion(dataReader, fromPeer);
                         break;
                     default:
                         // handle unknown value
