@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System;
 using VoxPopuliLibrary.common.physic;
 using VoxPopuliLibrary.common.voxel.client;
 using VoxPopuliLibrary.common.voxel.common;
@@ -57,9 +58,9 @@ namespace VoxPopuliLibrary.common.ecs
         }
         private void UpdateCollider()
         {
-            float x = (float)Position.X;
-            float y = (float)Position.Y;
-            float z = (float)Position.Z;
+            double x = Position.X;
+            double y = Position.Y;
+            double z = Position.Z;
 
             Coll.x1 = x - EntityWidth / 2;
             Coll.x2 = x + EntityWidth / 2;
@@ -88,9 +89,9 @@ namespace VoxPopuliLibrary.common.ecs
             for (int _ = 0; _ < 3; _++)
             {
                 Vector3 AVel = Velocity * DT;
-                float vx = AVel.X;
-                float vy = AVel.Y;
-                float vz = AVel.Z;
+                double vx = AVel.X;
+                double vy = AVel.Y;
+                double vz = AVel.Z;
                 int step_x = vx > 0 ? 1 : -1;
                 int step_y = vy > 0 ? 1 : -1;
                 int step_z = vz > 0 ? 1 : -1;
@@ -102,7 +103,7 @@ namespace VoxPopuliLibrary.common.ecs
                 int cx = (int)Math.Floor(Position.X + Velocity.X);
                 int cy = (int)Math.Floor(Position.Y + Velocity.Y);
                 int cz = (int)Math.Floor(Position.Z + Velocity.Z);
-                List<Tuple<float?, Vector3>> PossibleCollision = new List<Tuple<float?, Vector3>>();
+                List<Tuple<double?, Vector3>> PossibleCollision = new List<Tuple<double?, Vector3>>();
                 for (int i = x - step_x * (steps_xz + 1); vx > 0 ? i < cx + step_x * (steps_xz + 2) : i > cx + step_x * (steps_xz + 2); i += step_x)
                 {
                     for (int j = y - step_y * (steps_y + 2); vy > 0 ? j < cy + step_y * (steps_y + 3) : j > cy + step_y * (steps_y + 3); j += step_y)
@@ -115,22 +116,22 @@ namespace VoxPopuliLibrary.common.ecs
                                 {
                                     foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {
-                                        (float? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);
+                                        (double? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);
                                         if (entry_time == null)
                                         {
                                             continue;
                                         }
                                         //Console.WriteLine("Entryt: " + entry_time + " Normal" + normal.ToString());
-                                        PossibleCollision.Add(new Tuple<float?, Vector3>(entry_time, normal));
+                                        PossibleCollision.Add(new Tuple<double?, Vector3>(entry_time, normal));
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (PossibleCollision.Count() != 0)
+                if (PossibleCollision.Count != 0)
                 {
-                    (float? entry_time, Vector3 normal) = PossibleCollision.OrderBy(x => x.Item1).First();
+                    (double? entry_time, Vector3 normal) = PossibleCollision.OrderBy(x => x.Item1).First();
                     entry_time -= 0.001f;
                     if (normal.X != 0)
                     {
@@ -176,9 +177,9 @@ namespace VoxPopuliLibrary.common.ecs
             {
                 Vector3 AVel = Velocity * DT;
 
-                float vx = AVel.X;
-                float vy = AVel.Y;
-                float vz = AVel.Z;
+                double vx = AVel.X;
+                double vy = AVel.Y;
+                double vz = AVel.Z;
 
                 int step_x = vx > 0 ? 1 : -1;
 
@@ -197,7 +198,7 @@ namespace VoxPopuliLibrary.common.ecs
                 int cx = (int)Math.Floor(Position.X + Velocity.X);
                 int cy = (int)Math.Floor(Position.Y + Velocity.Y);
                 int cz = (int)Math.Floor(Position.Z + Velocity.Z);
-                List<Tuple<float?, Vector3>> PossibleCollision = new List<Tuple<float?, Vector3>>();
+                List<Tuple<double?, Vector3>> PossibleCollision = new List<Tuple<double?, Vector3>>();
                 for (int i = x - step_x * (steps_xz + 1); vx > 0 ? i < cx + step_x * (steps_xz + 2) : i > cx + step_x * (steps_xz + 2); i += step_x)
                 {
                     for (int j = y - step_y * (steps_y + 2); vy > 0 ? j < cy + step_y * (steps_y + 3) : j > cy + step_y * (steps_y + 3); j += step_y)
@@ -211,23 +212,23 @@ namespace VoxPopuliLibrary.common.ecs
                                     foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {
                                         //Console.WriteLine("Block " + i + " : " + j + " : " + k + " id " + id);
-                                        (float? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);
+                                        (double? entry_time, Vector3 normal) = Coll.Collide(collider.Move(new Vector3i(i, j, k)), AVel);
 
                                         if (entry_time == null)
                                         {
                                             continue;
                                         }
                                         //Console.WriteLine("Entryt: " + entry_time + " Normal" + normal.ToString());
-                                        PossibleCollision.Add(new Tuple<float?, Vector3>(entry_time, normal));
+                                        PossibleCollision.Add(new Tuple<double?, Vector3>(entry_time, normal));
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (PossibleCollision.Count() != 0)
+                if (PossibleCollision.Count != 0)
                 {
-                    (float? entry_time, Vector3 normal) = PossibleCollision.OrderBy(x => x.Item1).First();
+                    (double? entry_time, Vector3 normal) = PossibleCollision.OrderBy(x => x.Item1).First();
 
                     entry_time -= 0.001f;
                     if (normal.X != 0)

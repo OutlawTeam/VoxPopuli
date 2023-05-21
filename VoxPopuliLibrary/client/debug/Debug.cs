@@ -7,6 +7,7 @@ using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
+using VoxPopuliLibrary.client.config;
 using VoxPopuliLibrary.client.graphic.renderer;
 using VoxPopuliLibrary.common.ecs.client;
 using VoxPopuliLibrary.common.voxel.client;
@@ -53,7 +54,6 @@ namespace VoxPopuliLibrary.client.debug
             ImGui.Text("Game Version:");
             ImGui.Text("Client: " + common.Version.VersionNumber);
             ImGui.Text("Server: " + network.Network.ServerVersion);
-
             if (ImGui.Button("Entity Menu"))
                 EntityMenu = true;
             if (ImGui.Button("Voxel Menu"))
@@ -220,8 +220,10 @@ namespace VoxPopuliLibrary.client.debug
                 //Show player aabb
                 foreach (var entity in PlayerFactory.PlayerList.Values)
                 {
-                    RenderSystem.RenderDebugBox(new DebugBox(new Vector3d(entity.EntityWidth, entity.EntityHeight, entity.EntityWidth), new Vector4(1f, 0f, 0f, 1f)),
-                    new Vector3(entity.Coll.x1, entity.Coll.y1, entity.Coll.z1));
+                    RenderSystem.RenderDebugBox(new DebugBox(
+                        new Vector3d(entity.EntityWidth, entity.EntityHeight, entity.EntityWidth),
+                        new Vector4(1f, 0f, 0f, 1f)),
+                        new Vector3((float)entity.Coll.x1, (float)entity.Coll.y1, (float)entity.Coll.z1));
                 }
             }
             if (DebugChunk)

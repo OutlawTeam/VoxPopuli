@@ -55,7 +55,7 @@ namespace VoxPopuliLibrary.client.network
                         PlayerFactory.HandleSpawn(dataReader, fromPeer);
                         break;
                     case NetworkProtocol.ChunkOneBlockChange:
-                        ChunkManager.HandleChunkUpdate(dataReader, fromPeer);
+                        ChunkManager.HandleChunkUpdate(dataReader);
                         break;
                     case NetworkProtocol.PlayerPosition:
                         PlayerFactory.HandleData(dataReader, fromPeer);

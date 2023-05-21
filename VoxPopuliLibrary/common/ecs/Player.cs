@@ -3,23 +3,13 @@ using LiteNetLib.Utils;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using VoxPopuliLibrary.client;
 using VoxPopuliLibrary.client.graphic;
-using VoxPopuliLibrary.client.graphic.renderer;
+using VoxPopuliLibrary.client.ressource;
 using VoxPopuliLibrary.common.ecs.client;
 namespace VoxPopuliLibrary.common.ecs
 {
     internal class Player : Entity
     {
-        private static float[] vertices =
-        {
-             -0.5f,0.5f,0f,0f,1f,
-             -0.5f,-0.5f,0f,0f,0f,
-             0.5f,-0.5f,0f,1f,0f,
-             0.5f,-0.5f,0f,1f,0f,
-             0.5f,0.5f,0f,1f,1f,
-             -0.5f,0.5f,0f,0f,1f
-        };
         internal float sensitivity = 0.2f;
         internal float cameraSpeed = 5f;
         internal float speed;
@@ -47,7 +37,7 @@ namespace VoxPopuliLibrary.common.ecs
                 {
                     _Camera = new Camera((Vector3)_Position, 16 / 9);
                 }
-                _Model = new Model(vertices, GlobalVariable._playertexture, GlobalVariable.EntityShader);
+                _Model = RessourceManager.GetModel("Player");
             }
             ClientID = _ClientID;
         }
@@ -148,13 +138,12 @@ namespace VoxPopuliLibrary.common.ecs
                 }
             }
             Elevation = (float)Math.Abs(Math.Acos(_Camera.Front.Y));
-            Front = new Vector3(_Camera.Front.X, 0, _Camera.Front.Z);
+            Front = new Vector3(_Camera.Front.X, 0, _Camera.Front.Z).Normalized();
             Right = new Vector3(_Camera.Right.X, 0, _Camera.Right.Z);
             SendControl();
             CollisionTerrain(DT);
             _Camera.Position = new Vector3((float)Position.X, (float)Position.Y + EntityEYEHeight, (float)Position.Z);
         }
-
         internal void SendControl()
         {
             NetDataWriter message = new NetDataWriter();
@@ -168,14 +157,13 @@ namespace VoxPopuliLibrary.common.ecs
             message.Put(Rotation.X);
             message.Put(Rotation.Y);
             message.Put(Rotation.Z);
-            message.Put(_Camera.Front.X);
+            message.Put(Front.X);
             message.Put(0f);
-            message.Put(_Camera.Front.Z);
+            message.Put(Front.Z);
             message.Put(_Camera.Right.X);
             message.Put(0f);
             message.Put(_Camera.Right.Z);
             message.Put(Elevation);
-
             message.Put(Fly);
             if (VoxPopuliLibrary.client.network.Network.Server != null)
             {
@@ -194,23 +182,15 @@ namespace VoxPopuliLibrary.common.ecs
                 VoxPopuliLibrary.client.network.Network.Server.Send(message, DeliveryMethod.ReliableUnordered);
             }
         }
-        internal void RenderPlayerUtils()
-        {
-            if (BlockIsSec)
-            {
-                RenderSystem.RenderDebugBox(GlobalVariable.BlockSelectionBox, new Vector3(BlockSePos.X - 0.125f, BlockSePos.Y - 0.125f, BlockSePos.Z - 0.125f));
-            }
-
-        }
         internal void Render()
         {
             GL.BindVertexArray(_Model.Vao);
-            _Model.Texture.Use(TextureUnit.Texture0);
-            _Model._Shader.Use();
+            RessourceManager.GetTexture("Player").Use(TextureUnit.Texture0);
+            RessourceManager.GetShader("Entity").Use();
             var model = Matrix4.Identity * Matrix4.CreateTranslation(new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight), (float)Position.Z)) /** Matrix4.CreateRotationY(Rotation.Y)*/;
-            _Model._Shader.SetMatrix4("model", model);
-            _Model._Shader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
-            _Model._Shader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
+            RessourceManager.GetShader("Entity").SetMatrix4("model", model);
+            RessourceManager.GetShader("Entity").SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
+            RessourceManager.GetShader("Entity").SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
             GL.DrawArrays(PrimitiveType.Triangles, 0, _Model._Vertices.Count());
             GL.BindVertexArray(0);
         }

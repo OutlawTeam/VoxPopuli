@@ -1,0 +1,33 @@
+﻿using System;
+using Newtonsoft.Json;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Exemple de tableau float[][]
+        float[][] array = new float[][]{
+                new float[]{0f, 1f, 0f, 1f, 1f, 0f, 1f, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0f, 1f, 0f},//top
+                new float[]{0f, 0f, 0f, 1f, 0f, 0f, 1f, 0f, 1f, 1f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 0f},//bottom
+                new float[]{0f, 0f, 1f, 1f, 0f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 0f, 0f, 1f}, //front
+                new float[]{0f, 0f, 0f, 1f, 0f, 0f, 1f, 1f, 0f, 1f, 1f, 0f, 0f, 1f, 0f, 0f, 0f, 0f},//back
+                new float[]{1f, 1f, 1f, 1f, 1f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f, 0f, 1f, 1f, 1f, 1f},// right
+                new float[]{0f, 1f, 1f, 0f, 1f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 0f, 1f, 1f}//left
+                };
+
+        string name = "Cube";
+
+        // Création de l'objet contenant le nom et le tableau
+        var data = new
+        {
+            Name = name,
+            Model = array
+        };
+
+        // Conversion en format JSON
+        string json = JsonConvert.SerializeObject(data);
+
+        // Affichage du résultat
+        Console.WriteLine(json);
+    }
+}

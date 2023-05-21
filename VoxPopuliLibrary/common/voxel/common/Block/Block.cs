@@ -20,21 +20,16 @@ namespace VoxPopuliLibrary.common.voxel.common
 
     internal class block
     {
-        internal float[] texture0 = new float[12];
-        internal float[] texture1 = new float[12];
-        internal float[] texture2 = new float[12];
-        internal float[] texture3 = new float[12];
-        internal float[] texture4 = new float[12];
-        internal float[] texture5 = new float[12];
+        internal float[] texture0;
+        internal float[] texture1;
+        internal float[] texture2;
+        internal float[] texture3;
+        internal float[] texture4;
+        internal float[] texture5;
         internal bool IsTransparent;
         internal bool IsSolid = true;
         internal bool Cube = true;
         internal BlockMesh Mesh;
-        internal List<Collider> Colliders = new List<Collider>();
+        internal Collider[] Colliders;
     }
-    internal class BlockMesh
-    {
-        internal float[][] Mesh;
-    }
-    
 }

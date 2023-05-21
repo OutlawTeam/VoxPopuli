@@ -59,7 +59,7 @@ namespace VoxPopuliLibrary.client.graphic
         }
         public Matrix4 GetProjectionMatrix()
         {
-            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.1f, 1024f);
+            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.05f, 1024f);
         }
         private void UpdateVectors()
         {

@@ -8,6 +8,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using VoxPopuliLibrary.client.debug;
+using VoxPopuliLibrary.client.ressource;
 using VoxPopuliLibrary.common.ecs.client;
 
 namespace VoxPopuliLibrary.client.graphic.renderer
@@ -40,11 +41,11 @@ namespace VoxPopuliLibrary.client.graphic.renderer
         internal static void RenderDebugBox(DebugBox box, Vector3 pos)
         {
             // Envoi des matrices view et projection au shader
-            GlobalVariable.DebugShader.SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
-            GlobalVariable.DebugShader.SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
-            GlobalVariable.DebugShader.SetMatrix4("model", Matrix4.Zero + Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z)));
-            GlobalVariable.DebugShader.SetVector4("colors", box.Color);
-            GlobalVariable.DebugShader.Use();
+            RessourceManager.GetShader("Debug").SetMatrix4("view", PlayerFactory.LocalPlayer._Camera.GetViewMatrix());
+            RessourceManager.GetShader("Debug").SetMatrix4("projection", PlayerFactory.LocalPlayer._Camera.GetProjectionMatrix());
+            RessourceManager.GetShader("Debug").SetMatrix4("model", Matrix4.Zero + Matrix4.CreateTranslation(new Vector3(pos.X, pos.Y, pos.Z)));
+            RessourceManager.GetShader("Debug").SetVector4("colors", box.Color);
+            RessourceManager.GetShader("Debug").Use();
             GL.BindVertexArray(box.VAO);
             GL.DrawElements(PrimitiveType.Lines, 24, DrawElementsType.UnsignedInt, 0);
         }

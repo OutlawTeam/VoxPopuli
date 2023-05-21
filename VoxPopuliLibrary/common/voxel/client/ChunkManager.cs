@@ -137,7 +137,7 @@ namespace VoxPopuliLibrary.common.voxel.client
                 }
             }
         }
-        internal static Chunk getchunk(int x, int y)
+        internal static Chunk GetChunk(int x, int y)
         {
             if (Clist.TryGetValue(new Vector2i(x, y), out Chunk ch))
             {
@@ -170,13 +170,13 @@ namespace VoxPopuliLibrary.common.voxel.client
             byte[] blocks = data.GetRemainingBytes();
 
             blocks = LZ4Pickler.Unpickle(blocks);
-            ushort[] block = Utils.bytestoints(blocks);
+            ushort[] block = Utils.BytesToInts(blocks);
             if (!Clist.TryGetValue(cpos, out Chunk vtff))
             {
                 Clist.Add(cpos, new Chunk(block, cpos));
             }
         }
-        internal static async void HandleChunkUpdate(NetDataReader data, NetPeer peer)
+        internal static async void HandleChunkUpdate(NetDataReader data)
         {
             ushort block = data.GetUShort();
             Vector2i cpos = new Vector2i(data.GetInt(), data.GetInt());
@@ -225,10 +225,32 @@ namespace VoxPopuliLibrary.common.voxel.client
                 return false;
             }
         }
+        internal static bool GetBlockChunkRelative(int x, int y, int z, out ushort id)
+        {
+            (Vector2i cpos, Vector3i bpos) = math.Coord.GetVoxelCoordChunkRelative(x, y, z);
+            if (Clist.TryGetValue(new Vector2i(cpos.X, cpos.Y), out Chunk ch))
+            {
+                if (bpos.Y >= 0 && bpos.Y < GlobalVariable.CHUNK_HEIGHT)
+                {
+                    id = ch.GetBlock(bpos.X, bpos.Y, bpos.Z);
+                    return true;
+                }
+                else
+                {
+                    id = 0;
+                    return false;
+                }
+            }
+            else
+            {
+                id = 0;
+                return false;
+            }
+        }
     }
     internal static class Utils
     {
-        internal static ushort[] bytestoints(byte[] input)
+        internal static ushort[] BytesToInts(byte[] input)
         {
             var size = input.Length / sizeof(short);
             var ints = new ushort[size];

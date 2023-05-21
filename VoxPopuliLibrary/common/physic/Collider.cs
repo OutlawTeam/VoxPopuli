@@ -1,11 +1,12 @@
 ﻿using OpenTK.Mathematics;
 namespace VoxPopuliLibrary.common.physic
 {
+    [Serializable]
     internal class Collider
     {
-        internal float x1, y1, z1;
-        internal float x2, y2, z2;
-        internal Collider(Vector3 pos1 = default, Vector3 pos2 = default)
+        public double x1, y1, z1;
+        public double x2, y2, z2;
+        public Collider(Vector3d pos1 = default, Vector3d pos2 = default)
         {
             x1 = pos1.X;
             y1 = pos1.Y;
@@ -22,11 +23,11 @@ namespace VoxPopuliLibrary.common.physic
 
         }
 
-        internal float Time(float x, float y)
+        internal static double Time(double x, double y)
         {
             if (y == 0f)
             {
-                return x > 0 ? float.NegativeInfinity : float.PositiveInfinity;
+                return x > 0 ? double.NegativeInfinity : double.PositiveInfinity;
             }
             else
             {
@@ -34,17 +35,17 @@ namespace VoxPopuliLibrary.common.physic
             }
         }
 
-        public (float?, Vector3) Collide(Collider collider, Vector3 velocity)
+        public (double?, Vector3) Collide(Collider collider, Vector3 velocity)
         {
-            float vx = velocity.X, vy = velocity.Y, vz = velocity.Z;
-            float x_entry = Time(vx > 0 ? collider.x1 - x2 : collider.x2 - x1, vx);
-            float x_exit = Time(vx > 0 ? collider.x2 - x1 : collider.x1 - x2, vx);
+            double vx = velocity.X, vy = velocity.Y, vz = velocity.Z;
+            double x_entry = Time(vx > 0 ? collider.x1 - x2 : collider.x2 - x1, vx);
+            double x_exit = Time(vx > 0 ? collider.x2 - x1 : collider.x1 - x2, vx);
 
-            float y_entry = Time(vy > 0 ? collider.y1 - y2 : collider.y2 - y1, vy);
-            float y_exit = Time(vy > 0 ? collider.y2 - y1 : collider.y1 - y2, vy);
+            double y_entry = Time(vy > 0 ? collider.y1 - y2 : collider.y2 - y1, vy);
+            double y_exit = Time(vy > 0 ? collider.y2 - y1 : collider.y1 - y2, vy);
 
-            float z_entry = Time(vz > 0 ? collider.z1 - z2 : collider.z2 - z1, vz);
-            float z_exit = Time(vz > 0 ? collider.z2 - z1 : collider.z1 - z2, vz);
+            double z_entry = Time(vz > 0 ? collider.z1 - z2 : collider.z2 - z1, vz);
+            double z_exit = Time(vz > 0 ? collider.z2 - z1 : collider.z1 - z2, vz);
 
             if (x_entry < 0 && y_entry < 0 && z_entry < 0)
             {
@@ -56,8 +57,8 @@ namespace VoxPopuliLibrary.common.physic
                 return (null, Vector3.Zero);
             }
 
-            float entry = Math.Max(Math.Max(x_entry, y_entry), z_entry);
-            float exit_ = Math.Min(Math.Min(x_exit, y_exit), z_exit);
+            double entry = Math.Max(Math.Max(x_entry, y_entry), z_entry);
+            double exit_ = Math.Min(Math.Min(x_exit, y_exit), z_exit);
             //Console.WriteLine(entry + " " + exit_);
             if (entry > exit_)
             {
@@ -81,10 +82,10 @@ namespace VoxPopuliLibrary.common.physic
 
         public Collider Move(Vector3 pos)
         {
-            float x = pos.X;
-            float y = pos.Y;
-            float z = pos.Z;
-            return new Collider(new Vector3(this.x1 + x, this.y1 + y, this.z1 + z), new Vector3(this.x2 + x, this.y2 + y, this.z2 + z));
+            double x = pos.X;
+            double y = pos.Y;
+            double z = pos.Z;
+            return new Collider(new Vector3d(x1 + x, y1 + y, z1 + z), new Vector3d(x2 + x, y2 + y, z2 + z));
         }
     }
 }

@@ -9,6 +9,8 @@ using VoxPopuliLibrary.common.ecs.server;
 using VoxPopuliLibrary.common.voxel.common;
 using VoxPopuliLibrary.common.voxel.server;
 using VoxPopuliLibrary.server.network;
+using VoxPopuliLibrary.server.ressource;
+
 namespace VoxPopuliLibrary.server.program
 {
     public static class Program
@@ -47,13 +49,14 @@ namespace VoxPopuliLibrary.server.program
                                                                   | |                          
                                                                   |_|              
             */
-
-            BlockManager.init();
-            Console.WriteLine("Blocks has been Initialize");
+            RessourceManager.LoadRessources();
+            Console.WriteLine("Ressources have been Initialize");
+            BlockManager.InitServer();
+            Console.WriteLine("Blocks have been Initialize");
             GlobalVariable.LoadServer();
-            Console.WriteLine("Settings has been Initialize");
+            Console.WriteLine("Settings have been Initialize");
             Network.StartServer(23482);
-            Console.WriteLine("Network has been Initialized");
+            Console.WriteLine("Network have been Initialized");
 
             Console.WriteLine("The server has finished initializing, it is now ready at: " + Network.server.LocalPort);
             Console.WriteLine("Server game version: " + common.Version.VersionNumber);
