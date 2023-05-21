@@ -1,4 +1,4 @@
-https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white
+![Skill](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![GitHub Workflow Status](https://github.com/OutlawTeam/VoxPopuli/actions/workflows/dotnet.yml/badge.svg)
 ![GitHub language count](https://img.shields.io/github/languages/count/OutlawTeam/VoxPopuli)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/OutlawTeam/VoxPopuli)
