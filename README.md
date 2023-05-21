@@ -4,6 +4,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/OutlawTeam/VoxPopuli)
 ![GitHub release (latest by date)](https://img.shields.io/github/downloads/OutlawTeam/VoxPopuli/latest/total)
 ![GitHub all releases](https://img.shields.io/github/downloads/OutlawTeam/VoxPopuli/total)
+![codeql](https://github.com/OutlawTeam/VoxPopuli/actions/workflows/codeql.yml/badge.svg)
 # VoxPopuli
 
 Not Open Source , all rights to outlaw team
