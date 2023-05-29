@@ -7,24 +7,20 @@ using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
-using VoxPopuliLibrary.client.config;
-using VoxPopuliLibrary.common.voxel.client;
-using VoxPopuliLibrary.common.voxel.common;
-using VoxPopuliLibrary.Engine.client.graphic;
-using VoxPopuliLibrary.Engine.common;
-using VoxPopuliLibrary.Engine.Player;
-using VoxPopuliLibrary.Engine.server.program;
-
+using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.Network;
+using VoxPopuliLibrary.Engine.World;
 namespace VoxPopuliLibrary.Engine.Debug
 {
     public static class DebugSystem
     {
+        internal static bool Opened = false;
         // progiller variable
-        static internal double RenderTime = 0;
-        static internal double UpdateTime = 0;
-        static internal double MeshGenerationTime = 0;
-        static internal double ClearTime = 0;
-        static internal double ChunkRenderTime = 0;
+        internal static double RenderTime = 0;
+        internal static double UpdateTime = 0;
+        internal static double MeshGenerationTime = 0;
+        internal static double ClearTime = 0;
+        internal static double ChunkRenderTime = 0;
         //Menu visiblity bool
         static bool PlayerMenu;
         static bool VoxelMenu;
@@ -48,7 +44,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         //Imgui Controller
         static ImGuiController Controller;
 
-        static Thread ServerLocalThread = new Thread(Program.Main);
+        static Thread ServerLocalThread = new Thread(Program.Program.Main);
 
         /// <summary>
         /// Function who draw debug menu
@@ -84,8 +80,11 @@ namespace VoxPopuliLibrary.Engine.Debug
             if (ImGui.BeginMenu("Info"))
             {
                 ImGui.Text("Game Version:");
-                ImGui.Text("Client: " + common.Version.VersionNumber);
-                ImGui.Text("Server: " + Network.Network.ServerVersion);
+                ImGui.Text("Client game version: " + API.Version.GameVersion);
+                ImGui.Text("Client engine version: " + API.Version.EngineVersion);
+                ImGui.Text("Client api version: " + API.Version.APIVersion);
+                ImGui.Text("Server game version: " + ClientNetwork.ServerGameVersion);
+                ImGui.Text("Server engine version: " + ClientNetwork.ServerEngineVersion);
                 ImGui.EndMenu();
             }
             ImGui.EndMainMenuBar();
@@ -137,23 +136,23 @@ namespace VoxPopuliLibrary.Engine.Debug
                 PlayerMenu = false;
             }
             ImGui.SeparatorText("Local Player");
-            if (PlayerFactory.LocalPlayerExist)
+            if (ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayerExist)
             {
-                ImGui.Text($"Player Position: {PlayerFactory.LocalPlayer.Position}");
-                ImGui.SliderFloat("FOV", ref PlayerFactory.LocalPlayer._Camera._fov, MathHelper.PiOver3, MathHelper.PiOver2);
-                ImGui.InputInt("Selected Block", ref PlayerFactory.LocalPlayer.SelectedBlock);
-                ImGui.Checkbox("Fly", ref PlayerFactory.LocalPlayer.Fly);
+                ImGui.Text($"Player Position: {ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position}");
+                ImGui.SliderFloat("FOV", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer._Camera._fov, MathHelper.PiOver3, MathHelper.PiOver2);
+                ImGui.InputInt("Selected Block", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SelectedBlock);
+                ImGui.Checkbox("Fly", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Fly);
                 ImGui.InputFloat("x", ref px);
                 ImGui.InputFloat("y", ref py);
                 ImGui.InputFloat("z", ref pz);
                 if (ImGui.Button("Teleport"))
                 {
-                    PlayerFactory.LocalPlayer.Position = new Vector3(px, py, pz);
-                    PlayerFactory.LocalPlayer.SendPos();
+                    ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position = new Vector3(px, py, pz);
+                    ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SendPos();
                 }
             }
             ImGui.SeparatorText("Player Factory");
-            ImGui.Text("Player count :" + PlayerFactory.PlayerList.Count.ToString());
+            ImGui.Text("Player count :" + ClientWorldManager.world.GetPlayerFactoryClient().PlayerList.Count.ToString());
             ImGui.End();
         }
         /// <summary>
@@ -166,15 +165,15 @@ namespace VoxPopuliLibrary.Engine.Debug
             {
                 VoxelMenu = false;
             }
-            ImGui.Text($"Number of chunk: {ChunkManager.Clist.Count}");
-            ImGui.SliderInt("Render Distance:", ref GlobalVariable.RenderDistance, 2, 32);
-            ImGui.SliderInt("Vertical Render Distance:", ref GlobalVariable.RenderDistanceVertical, 2, 10);
+            ImGui.Text($"Number of chunk: {ClientWorldManager.world.GetChunkManagerClient().Clist.Count}");
+            ImGui.SliderInt("Render Distance:", ref ClientWorldManager.world.RenderDistance, 2, 32);
+            ImGui.SliderInt("Vertical Render Distance:", ref ClientWorldManager.world.VerticalRenderDistance, 2, 10);
             ImGui.InputInt("Block x:", ref bx);
             ImGui.InputInt("Block y:", ref by);
             ImGui.InputInt("Block z:", ref bz);
             ImGui.InputInt("Replace block id:", ref blockid);
             if (ImGui.Button("Send chunk modification"))
-                ChunkManager.ChangeChunk(new Vector3i(bx, by, bz), (ushort)blockid);
+                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(new Vector3i(bx, by, bz), (ushort)blockid);
             ImGui.Separator();
             ImGui.Checkbox("ChunkDebug", ref DebugChunk);
 
@@ -194,7 +193,7 @@ namespace VoxPopuliLibrary.Engine.Debug
             ImGui.InputInt("Port", ref port);
             if (ImGui.Button("Connect"))
             {
-                Network.Network.Connect(ip, port);
+                ClientNetwork.Connect(ip, port);
             }
             ImGui.Separator();
             if (ImGui.Button("StartLocalServer"))
@@ -216,9 +215,9 @@ namespace VoxPopuliLibrary.Engine.Debug
             ImGui.Separator();
             ImGui.Text("Chunks graphics informations");
             ImGui.Text("Chunks which have mesh update");
-            ImGui.Text(ChunkManager.ChunkMeshUpdated.ToString());
+            ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkMeshUpdated.ToString());
             ImGui.Text("Chunks rendered");
-            ImGui.Text(ChunkManager.ChunkRendered.ToString());
+            ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkRendered.ToString());
             if (ImGui.Button("Debug Mesh"))
             {
                 if (WireFrameView == true)
@@ -252,7 +251,7 @@ namespace VoxPopuliLibrary.Engine.Debug
             if (ShowAABB)
             {
                 //Show player aabb
-                foreach (var entity in PlayerFactory.PlayerList.Values)
+                foreach (var entity in ClientWorldManager.world.GetPlayerFactoryClient().PlayerList.Values)
                 {
                     RenderSystem.RenderDebugBox(new DebugBox(
                         new Vector3d(entity.EntityWidth, entity.EntityHeight, entity.EntityWidth),
@@ -262,7 +261,7 @@ namespace VoxPopuliLibrary.Engine.Debug
             }
             if (DebugChunk)
             {
-                foreach (Chunk ch in ChunkManager.Clist.Values)
+                foreach (Chunk ch in ClientWorldManager.world.GetChunkManagerClient().Clist.Values)
                 {
                     if (ch.Empty == false && ch.VerticeCount != 0)
                     {

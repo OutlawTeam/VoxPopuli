@@ -18,15 +18,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="client\utils\**" />
-    <EmbeddedResource Remove="client\utils\**" />
-    <None Remove="client\utils\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="ImGui.NET" Version="1.89.5" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.3.5" />
-    <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
+    <PackageReference Include="LiteNetLib" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenTK" Version="4.7.7" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
@@ -35,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="common\ressource\client\" />
-    <Folder Include="common\ressource\server\" />
+    <Folder Include="Game\" />
   </ItemGroup>
 
 </Project>
