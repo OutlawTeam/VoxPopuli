@@ -3,15 +3,13 @@ using VoxPopuliLibrary.Engine.Physics;
 
 namespace VoxPopuliLibrary.Engine.API
 {
-    internal class BlockManager
+    internal static class BlockManager
     {
         public static Block dirt = new Block();
         public static Block grass = new Block();
         public static Block cobblestone = new Block();
         public static Block slab = new Block();
-        public static Dictionary<int, Block> BlockList = new Dictionary<int, Block>();
-        public static int id = 1;
-        internal static Collider CubeColl = new Collider(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+        public static Dictionary<string, Block> BlockList = new Dictionary<string, Block>();
         public static void InitClient()
         {
             dirt.texture0 = RessourceManager.RessourceManager.GetAtlasTextures("dirt");/*TextureAtlas.IdtoCord(0)*///;
@@ -24,8 +22,7 @@ namespace VoxPopuliLibrary.Engine.API
             dirt.Mesh = RessourceManager.RessourceManager.GetBlockMesh("Cube");
             dirt.IsSolid = true;
             dirt.Colliders = RessourceManager.RessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, dirt);
-            id++;
+            BlockList.Add("dirt", dirt);
             //grass
             grass.texture0 = RessourceManager.RessourceManager.GetAtlasTextures("grass");//TextureAtlas.IdtoCord(1);
             grass.texture1 = RessourceManager.RessourceManager.GetAtlasTextures("grass");//TextureAtlas.IdtoCord(1);
@@ -36,8 +33,7 @@ namespace VoxPopuliLibrary.Engine.API
             grass.IsTransparent = false;
             grass.Mesh = RessourceManager.RessourceManager.GetBlockMesh("Cube");
             grass.Colliders = RessourceManager.RessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, grass);
-            id++;
+            BlockList.Add("gras", grass);
             //cobblestone
             cobblestone.texture0 = RessourceManager.RessourceManager.GetAtlasTextures("cobblestone");//TextureAtlas.IdtoCord(3);
             cobblestone.texture1 = RessourceManager.RessourceManager.GetAtlasTextures("cobblestone");//TextureAtlas.IdtoCord(3);
@@ -48,27 +44,33 @@ namespace VoxPopuliLibrary.Engine.API
             cobblestone.IsTransparent = false;
             cobblestone.Mesh = RessourceManager.RessourceManager.GetBlockMesh("Cube");
             cobblestone.Colliders = RessourceManager.RessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, cobblestone);
-            id++;
+            BlockList.Add("cobblestone", cobblestone);
         }
         public static void InitServer()
         {
             dirt.IsTransparent = false;
             dirt.Colliders = RessourceManager.ServerRessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, dirt);
-            id++;
+            if(!BlockList.ContainsKey("dirt"))
+            {
+                BlockList.Add("dirt", dirt);
+            }
+            
 
             grass.IsTransparent = false;
             grass.Colliders = RessourceManager.ServerRessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, grass);
-            id++;
+            if (!BlockList.ContainsKey("grass"))
+            {
+                BlockList.Add("grass", grass);
+            }
 
             cobblestone.IsTransparent = false;
             cobblestone.Colliders = RessourceManager.ServerRessourceManager.GetPhysicCollider("Cube");
-            BlockList.Add(id, cobblestone);
-            id++;
+            if (!BlockList.ContainsKey("cobblestone"))
+            {
+                BlockList.Add("cobblestone", cobblestone);
+            }
         }
-        public static float[] GetTex(ushort id, int face)
+        public static float[] GetTex(string id, int face)
         {
             BlockList.TryGetValue(id, out var block);
             if (block != null)
@@ -103,9 +105,9 @@ namespace VoxPopuliLibrary.Engine.API
                 return RessourceManager.RessourceManager.GetAtlasTextures("unknow");
             }
         }
-        public static bool BlockTransparent(ushort id)
+        public static bool BlockTransparent(string id)
         {
-            if (id == 0)
+            if (id == "air")
             {
                 return true;
             }
@@ -125,7 +127,7 @@ namespace VoxPopuliLibrary.Engine.API
                 return true;
             }
         }
-        internal static float[] BlockMesh(ushort id, int face)
+        internal static float[] BlockMesh(string id, int face)
         {
             if (BlockList.TryGetValue(id, out var block))
             {
@@ -136,9 +138,9 @@ namespace VoxPopuliLibrary.Engine.API
                 return Array.Empty<float>();
             }
         }
-        public static bool BlockSolid(ushort id)
+        public static bool BlockSolid(string id)
         {
-            if (id == 0)
+            if (id == "air")
             {
                 return false;
             }

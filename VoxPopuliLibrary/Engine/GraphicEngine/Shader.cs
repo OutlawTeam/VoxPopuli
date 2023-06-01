@@ -8,9 +8,9 @@ using OpenTK.Mathematics;
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
     // A simple class meant to help create shaders.
-    public class Shader
+    internal class Shader
     {
-        public readonly int Handle;
+        internal readonly int Handle;
 
         private readonly Dictionary<string, int> _uniformLocations;
 
@@ -18,7 +18,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         // Shaders are written in GLSL, which is a language very similar to C in its semantics.
         // The GLSL source is compiled *at runtime*, so it can optimize itself for the graphics card it's currently being used on.
         // A commented example of GLSL can be found in shader.vert.
-        public Shader(string vertPath, string fragPath)
+        internal Shader(string vertPath, string fragPath)
         {
             // There are several different types of shaders, but the only two you need for basic rendering are the vertex and fragment shaders.
             // The vertex shader is responsible for moving around vertices, and uploading that data to the fragment shader.
@@ -116,14 +116,14 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         }
 
         // A wrapper function that enables the shader program.
-        public void Use()
+        internal void Use()
         {
             GL.UseProgram(Handle);
         }
 
         // The shader sources provided with this project use hardcoded layout(location)-s. If you want to do it dynamically,
         // you can omit the layout(location=X) lines in the vertex shader, and use this in VertexAttribPointer instead of the hardcoded values.
-        public int GetAttribLocation(string attribName)
+        internal int GetAttribLocation(string attribName)
         {
             return GL.GetAttribLocation(Handle, attribName);
         }
@@ -142,7 +142,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         /// </summary>
         /// <param name="name">The name of the uniform</param>
         /// <param name="data">The data to set</param>
-        public void SetInt(string name, int data)
+        internal void SetInt(string name, int data)
         {
             GL.UseProgram(Handle);
             GL.Uniform1(_uniformLocations[name], data);
@@ -153,7 +153,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         /// </summary>
         /// <param name="name">The name of the uniform</param>
         /// <param name="data">The data to set</param>
-        public void SetFloat(string name, float data)
+        internal void SetFloat(string name, float data)
         {
             GL.UseProgram(Handle);
             GL.Uniform1(_uniformLocations[name], data);
@@ -169,7 +169,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         ///   The matrix is transposed before being sent to the shader.
         ///   </para>
         /// </remarks>
-        public void SetMatrix4(string name, Matrix4 data)
+        internal void SetMatrix4(string name, Matrix4 data)
         {
             GL.UseProgram(Handle);
             GL.UniformMatrix4(_uniformLocations[name], true, ref data);
@@ -180,12 +180,12 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         /// </summary>
         /// <param name="name">The name of the uniform</param>
         /// <param name="data">The data to set</param>
-        public void SetVector3(string name, Vector3 data)
+        internal void SetVector3(string name, Vector3 data)
         {
             GL.UseProgram(Handle);
             GL.Uniform3(_uniformLocations[name], data);
         }
-        public void SetVector4(string name, Vector4 data)
+        internal void SetVector4(string name, Vector4 data)
         {
             GL.UseProgram(Handle);
             GL.Uniform4(_uniformLocations[name], data);

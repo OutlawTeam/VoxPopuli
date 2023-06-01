@@ -18,24 +18,22 @@ namespace VoxPopuliLibrary.Engine.World
                 throw new Exception("Chunk is not loaded");
             }
         }
-        internal void ChangeChunk(Vector3d blockp, ushort block)
+        internal void ChangeChunk(Vector3d blockp, string block)
         {
             (Vector3i cpos, Vector3i bpos) = Maths.Coord.GetVoxelCoord((int)blockp.X, (int)blockp.Y, (int)blockp.Z);
-            var message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(NetworkProtocol.ChunkOneBlockChangeDemand));
-            message.Put(cpos.X);
-            message.Put(cpos.Y);
-            message.Put(cpos.Z);
-            message.Put(bpos.X);
-            message.Put(bpos.Y);
-            message.Put(bpos.Z);
-            message.Put(block);
-            if (ClientNetwork.client.FirstPeer != null)
+            OneBlockChangeDemand packet = new OneBlockChangeDemand
             {
-                ClientNetwork.client.FirstPeer.Send(message, DeliveryMethod.ReliableUnordered);
-            }
+                BlockID = block,
+                cx = cpos.X,
+                cy = cpos.Y,
+                cz = cpos.Z,
+                bx = bpos.X,
+                by = bpos.Y,
+                bz = bpos.Z
+            };
+            ClientNetwork.SendPacket(packet, DeliveryMethod.ReliableOrdered);
         }
-        internal bool GetBlock(int x, int y, int z, out ushort id)
+        internal bool GetBlock(int x, int y, int z, out string id)
         {
             (Vector3i cpos, Vector3i bpos) = Maths.Coord.GetVoxelCoord(x, y, z);
             if (Clist.TryGetValue(cpos, out Chunk ch))
@@ -46,7 +44,7 @@ namespace VoxPopuliLibrary.Engine.World
             }
             else
             {
-                id = 0;
+                id = "air";
                 return false;
             }
         }

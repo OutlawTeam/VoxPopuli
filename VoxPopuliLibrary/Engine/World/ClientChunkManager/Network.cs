@@ -2,42 +2,46 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace VoxPopuliLibrary.Engine.World
 {
     internal partial class ClientChunkManager
     {
-        internal void HandleChunk(NetDataReader data, NetPeer peer)
+        internal void HandleChunk(ServerChunkData data, NetPeer peer)
         {
-            Vector3i cpos = new Vector3i(data.GetInt(), data.GetInt(), data.GetInt());
-            byte[] blocks = data.GetRemainingBytes();
-
-            blocks = LZ4Pickler.Unpickle(blocks);
-            ushort[] block = Utils.BytesToInts(blocks);
-            if (!Clist.TryGetValue(cpos, out Chunk vtff))
+            Vector3i pos = new Vector3i(data.x, data.y, data.z);
+            if (!Clist.TryGetValue(pos, out Chunk _))
             {
-                Clist.Add(cpos, new Chunk(block, cpos));
-                if (Clist[cpos].Empty == false)
+                Clist.Add(pos,new Chunk(data.data.data,data.data.pal,pos));
+                if (Clist[pos].Empty == false)
                 {
-                    ChunkMesh.Add(Clist[cpos]);
+                    ChunkMesh.Add(Clist[pos]);
                 }
             }
         }
-        internal void HandleChunkUpdate(NetDataReader data)
+        internal void HandleChunkUnload(UnloadChunk data, NetPeer peer)
         {
-            ushort block = data.GetUShort();
-            Vector3i cpos = new Vector3i(data.GetInt(), data.GetInt(), data.GetInt());
-            Vector3i cpos2 = new Vector3i(data.GetInt(), data.GetInt(), data.GetInt());
+            Console.WriteLine("test");
+            Vector3i pos = new Vector3i(data.x, data.y, data.z);
+            if (Clist.TryGetValue(pos, out Chunk _))
+            {
+                Clist.Remove(pos);
+            }
+        }
+        internal void HandleChunkUpdate(OneBlockChange data,NetPeer peer)
+        {
+            Vector3i cpos = new Vector3i(data.cx, data.cy, data.cy);
+            Vector3i bpos = new Vector3i(data.bx, data.by, data.bz);
             if (Clist.TryGetValue(cpos, out Chunk ch))
             {
-                ch.SetBlock(cpos2.X, cpos2.Y, cpos2.Z, block);
+                ch.SetBlock(bpos.X, bpos.Y, bpos.Z, data.BlockID);
                 if (ch.Empty == true)
                 {
-                    if (ch.Blocks.All(element => element == 0))
-                    {
-
-                    }
-                    else
+                    if (!ch.Blocks.All(element => element == 0))
                     {
                         ch.Empty = false;
                         ch.Changed = true;
@@ -52,7 +56,6 @@ namespace VoxPopuliLibrary.Engine.World
                     }
                     else
                     {
-                        ch.Empty = false;
                         ch.Changed = true;
                         ChunkMesh.Add(ch);
                     }
@@ -60,33 +63,51 @@ namespace VoxPopuliLibrary.Engine.World
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X + 1, cpos.Y, cpos.Z), out Chunk ch1))
             {
-                ch1.Changed = true;
-                ChunkMesh.Add(ch1);
+                if(ch1.Empty == false)
+                {
+                    ch1.Changed = true;
+                    ChunkMesh.Add(ch1);
+                }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X - 1, cpos.Y, cpos.Z), out Chunk ch2))
             {
-                ch2.Changed = true;
-                ChunkMesh.Add(ch2);
+                if(ch2.Empty == false)
+                {
+                    ch2.Changed = true;
+                    ChunkMesh.Add(ch2);
+                }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y - 1, cpos.Z), out Chunk ch3))
             {
-                ch3.Changed = true;
-                ChunkMesh.Add(ch3);
+                if (ch3.Empty == false)
+                {
+                    ch3.Changed = true;
+                    ChunkMesh.Add(ch3);
+                }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y + 1, cpos.Z), out Chunk ch4))
             {
-                ch4.Changed = true;
-                ChunkMesh.Add(ch4);
+                if (ch4.Empty == false)
+                {
+                    ch4.Changed = true;
+                    ChunkMesh.Add(ch4);
+                }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y, cpos.Z + 1), out Chunk ch5))
             {
-                ch5.Changed = true;
-                ChunkMesh.Add(ch5);
+                if (ch5.Empty == false)
+                {
+                    ch5.Changed = true;
+                    ChunkMesh.Add(ch5);
+                }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y, cpos.Z - 1), out Chunk ch6))
             {
-                ch6.Changed = true;
-                ChunkMesh.Add(ch6);
+                if (ch6.Empty == false)
+                {
+                    ch6.Changed = true;
+                    ChunkMesh.Add(ch6);
+                }
             }
         }
     }

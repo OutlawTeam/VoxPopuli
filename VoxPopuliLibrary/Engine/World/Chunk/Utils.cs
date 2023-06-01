@@ -1,14 +1,17 @@
-﻿using VoxPopuliLibrary.Engine.Maths;
+﻿using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.Maths;
 
 namespace VoxPopuliLibrary.Engine.World
 {
     internal partial class Chunk
     {
-        internal ushort GetBlock(int x, int y, int z)
+        internal string GetBlock(int x, int y, int z)
         {
             try
             {
-                return Blocks[Carray.TreetoOne(x, y, z)];
+                byte id = Blocks[Carray.TreetoOne(x, y, z)];
+                return ChunkPalette.GetBlock(id);
+                    
             }
             catch
             {
@@ -16,9 +19,16 @@ namespace VoxPopuliLibrary.Engine.World
                 throw new Exception("Block coordinate was supperior to chunk size or height.");
             }
         }
-        internal void SetBlock(int x, int y, int z, ushort id)
+        internal void SetBlock(int x, int y, int z, string id)
         {
-            Blocks[Carray.TreetoOne(x, y, z)] = id;
+            if(ChunkPalette.ContainBlock(id))
+            {
+                Blocks[Carray.TreetoOne(x, y, z)] = ChunkPalette.GetBlockId(id);
+            }
+            else
+            {
+                Blocks[Carray.TreetoOne(x, y, z)]= ChunkPalette.AddBlock(id);
+            }
         }
     }
 }

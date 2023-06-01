@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
-    public class Camera
+    internal class Camera
     {
         private Vector3 _front = -Vector3.UnitZ;
         private Vector3 _up = Vector3.UnitY;
@@ -15,17 +15,17 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         private float _yaw = -MathHelper.PiOver2;
         internal float _fov = MathHelper.PiOver2;
         internal Vector3 Direction { get { return new Vector3(-GetViewMatrix().M13, -GetViewMatrix().M23, -GetViewMatrix().M33); } }
-        public Camera(Vector3 position, float aspectRatio)
+        internal Camera(Vector3 position, float aspectRatio)
         {
             Position = position;
             AspectRatio = aspectRatio;
         }
-        public Vector3 Position { get; set; }
-        public float AspectRatio { private get; set; }
-        public Vector3 Front => _front;
-        public Vector3 Up => _up;
-        public Vector3 Right => _right;
-        public float Pitch
+        internal Vector3 Position { get; set; }
+        internal float AspectRatio { private get; set; }
+        internal Vector3 Front => _front;
+        internal Vector3 Up => _up;
+        internal Vector3 Right => _right;
+        internal float Pitch
         {
             get => MathHelper.RadiansToDegrees(_pitch);
             set
@@ -35,7 +35,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
                 UpdateVectors();
             }
         }
-        public float Yaw
+        internal float Yaw
         {
             get => MathHelper.RadiansToDegrees(_yaw);
             set
@@ -44,7 +44,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
                 UpdateVectors();
             }
         }
-        public float Fov
+        internal float Fov
         {
             get => MathHelper.RadiansToDegrees(_fov);
             set
@@ -54,11 +54,11 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             }
         }
 
-        public Matrix4 GetViewMatrix()
+        internal Matrix4 GetViewMatrix()
         {
             return Matrix4.LookAt(Position, Position + _front, _up);
         }
-        public Matrix4 GetProjectionMatrix()
+        internal Matrix4 GetProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.05f, 1024f);
         }

@@ -6,7 +6,6 @@ namespace VoxPopuliLibrary.Engine.World
     {
         internal void GenerateChunk()
         {
-
             for (int y = 0; y < ServerWorldManager.world.CHUNK_SIZE; y++)
             {
                 for (int x = 0; x < ServerWorldManager.world.CHUNK_SIZE; x++)
@@ -17,20 +16,20 @@ namespace VoxPopuliLibrary.Engine.World
                         {
                             if (Position.Y == 18 && y == 12)
                             {
-                                Blocks[Carray.TreetoOne(x, y, z)] = 1;
+                                SetBlock(x,y,z,"dirt");
                             }
                             else if (Position.Y == 18 && y < 12)
                             {
-                                Blocks[Carray.TreetoOne(x, y, z)] = 1;
+                                SetBlock(x, y, z, "dirt");
                             }
                             else
                             {
-                                Blocks[Carray.TreetoOne(x, y, z)] = 0;
+                                SetBlock(x, y, z, "air");
                             }
                         }
                         else
                         {
-                            Blocks[Carray.TreetoOne(x, y, z)] = 3;
+                            SetBlock(x, y, z, "cobblestone");
                         }
                     }
                 }

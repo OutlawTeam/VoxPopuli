@@ -28,7 +28,6 @@ namespace Vox_Populi
                 window.VSync = VSyncMode.On;
                 window.Run();
             }
-            ClientNetwork.DeConnect();
         }
     }
 }

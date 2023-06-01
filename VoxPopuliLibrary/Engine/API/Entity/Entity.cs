@@ -108,9 +108,9 @@ namespace VoxPopuliLibrary.Engine.API
                     {
                         for (int k = z - step_z * (steps_xz + 1); vz > 0 ? k < cz + step_z * (steps_xz + 2) : k > cz + step_z * (steps_xz + 2); k += step_z)
                         {
-                            if (ClientWorldManager.world.GetChunkManagerClient().GetBlock(i, j, k, out ushort id))
+                            if (ClientWorldManager.world.GetChunkManagerClient().GetBlock(i, j, k, out string id))
                             {
-                                if (id != 0)
+                                if (id != "air")
                                 {
                                     foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {
@@ -203,9 +203,9 @@ namespace VoxPopuliLibrary.Engine.API
                     {
                         for (int k = z - step_z * (steps_xz + 1); vz > 0 ? k < cz + step_z * (steps_xz + 2) : k > cz + step_z * (steps_xz + 2); k += step_z)
                         {
-                            if (ServerWorldManager.world.GetChunkManagerServer().GetBlock(i, j, k, out ushort id))
+                            if (ServerWorldManager.world.GetChunkManagerServer().GetBlock(i, j, k, out string id))
                             {
-                                if (id != 0)
+                                if (id != "air")
                                 {
                                     foreach (Collider collider in BlockManager.BlockList[id].Colliders)
                                     {

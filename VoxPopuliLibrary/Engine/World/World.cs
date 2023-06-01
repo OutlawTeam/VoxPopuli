@@ -41,7 +41,7 @@ namespace VoxPopuliLibrary.Engine.World
                 PlayerFactoryServer = new Player.ServerPlayerFactory();
             }
         }
-        public bool GetBlock(int x, int y, int z, out ushort id)
+        public bool GetBlock(int x, int y, int z, out string id)
         {
             if (Client)
             {

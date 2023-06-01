@@ -10,7 +10,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace VoxPopuliLibrary.Engine.Player
 {
-    public class ClientPlayerFactory
+    internal class ClientPlayerFactory
     {
         internal readonly Dictionary<ushort, Player> PlayerList = new Dictionary<ushort, Player>();
         internal Player LocalPlayer;
@@ -42,39 +42,28 @@ namespace VoxPopuliLibrary.Engine.Player
                 }
             }
         }
-        internal void HandleSpawn(NetDataReader data, NetPeer peer)
+        internal void HandleSpawn(PlayerSpawn data, NetPeer peer)
         {
-            ushort id = data.GetUShort();
-            Vector3d position = new Vector3d(data.GetDouble(), data.GetDouble(), data.GetDouble());
-            AddPlayer(id, position, false);
+            AddPlayer(data.ClientID, data.Position, false);
         }
-        internal void AddLocalPlayer(NetDataReader data, NetPeer peer)
+        internal void HandleLocalPlayer(PlayerSpawnLocal data, NetPeer peer)
         {
-            ushort id = data.GetUShort();
-            Vector3d position = new Vector3d(data.GetDouble(), data.GetDouble(), data.GetDouble());
-            AddPlayer(id, position, true);
+            AddPlayer(data.ClientID,data.Position, true);
         }
-        internal void HandleData(NetDataReader data, NetPeer peer)
+        internal void HandleData(PlayerData data, NetPeer peer)
         {
-            ushort id = data.GetUShort();
-            if (PlayerList.TryGetValue(id, out Player player))
+            if (PlayerList.TryGetValue(data.ClientID, out Player player))
             {
-                double x = data.GetDouble();
-                double y = data.GetDouble();
-                double z = data.GetDouble();
-                Vector3 rotation = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
                 if (player != LocalPlayer)
                 {
-                    player.Rotation = rotation;
+                    player.Rotation = data.Rotation;
                 }
-                player.Position = new Vector3d(x, y, z);
+                player.Position = data.Position;
             }
         }
-        internal void HandleDeco(NetDataReader data, NetPeer peer)
-        {
-            ushort id = data.GetUShort();
-            PlayerList.Remove(id);
+        internal void HandleDeco(PlayerDeco data, NetPeer peer)
+        { 
+            PlayerList.Remove(data.ClientID);
         }
-
     }
 }

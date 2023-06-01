@@ -45,7 +45,7 @@ namespace VoxPopuliLibrary.Engine.World
                 {
                     for (int z = 0; z < ClientWorldManager.world.CHUNK_SIZE; z++)
                     {
-                        if (GetBlock(x, y, z) != 0)
+                        if (GetBlock(x, y, z) != "air")
                         {
                             if (BlockManager.BlockList[GetBlock(x, y, z)].Cube)
                             {
@@ -186,7 +186,7 @@ namespace VoxPopuliLibrary.Engine.World
         /// <param name="z">Z coordinate</param>
         /// <param name="BF">Block face 0 top ; 1 bottom ; 2 front :3 back ; 4 right ; 5 left</param>
 
-        private void AddMeshFace(ushort Block, int x, int y, int z, int BF)
+        private void AddMeshFace(string Block, int x, int y, int z, int BF)
         {
             var Vert = BlockManager.BlockMesh(Block, BF);
             var Tex = BlockManager.GetTex(Block, BF);

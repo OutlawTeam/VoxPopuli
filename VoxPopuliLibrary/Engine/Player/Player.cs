@@ -158,42 +158,28 @@ namespace VoxPopuliLibrary.Engine.Player
         }
         internal void SendControl()
         {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(NetworkProtocol.PlayerSendControl));
-            message.Put(forward);
-            message.Put(backward);
-            message.Put(right);
-            message.Put(left);
-            message.Put(space);
-            message.Put(shift);
-            message.Put(control);
-            message.Put(Rotation.X);
-            message.Put(Rotation.Y);
-            message.Put(Rotation.Z);
-            message.Put(Front.X);
-            message.Put(0f);
-            message.Put(Front.Z);
-            message.Put(_Camera.Right.X);
-            message.Put(0f);
-            message.Put(_Camera.Right.Z);
-            message.Put(Elevation);
-            message.Put(Fly);
-            if (ClientNetwork.Server != null)
+            PlayerControl message = new PlayerControl
             {
-                ClientNetwork.Server.Send(message, DeliveryMethod.ReliableUnordered);
-            }
+                Forward = forward,
+                Backward = backward,
+                Right = right,
+                Left = left,
+                Space = space,
+                Shift = shift,
+                Control = control,
+                Rotation = Rotation,
+                Front = Front,
+                CRight = _Camera.Right,
+                Elevation = Elevation,
+                Fly = Fly
+            }; 
+            ClientNetwork.SendPacket(message, DeliveryMethod.ReliableUnordered);
+            
         }
         internal void SendPos()
         {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(NetworkProtocol.PlayerClientSendPos));
-            message.Put(Position.X);
-            message.Put(Position.Y);
-            message.Put(Position.Z);
-            if (ClientNetwork.Server != null)
-            {
-                ClientNetwork.Server.Send(message, DeliveryMethod.ReliableUnordered);
-            }
+            PlayerPositionTP packet = new PlayerPositionTP {Position =Position };
+            ClientNetwork.SendPacket(packet,DeliveryMethod.ReliableOrdered);
         }
         internal void Render()
         {
@@ -264,17 +250,8 @@ namespace VoxPopuliLibrary.Engine.Player
         }
         internal void SendData()
         {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(NetworkProtocol.PlayerPosition));
-            message.Put(ClientID);
-            message.Put(Position.X);
-            message.Put(Position.Y);
-            message.Put(Position.Z);
-            message.Put(Rotation.X);
-            message.Put(Rotation.Y);
-            message.Put(Rotation.Z);
-            ServerNetwork.server.SendToAll(message, DeliveryMethod.ReliableUnordered);
+            PlayerData packet = new PlayerData { ClientID = ClientID,Position = Position,Rotation = Rotation};
+            ServerNetwork.SendPacketToAll(packet,DeliveryMethod.Unreliable);
         }
-
     }
 }

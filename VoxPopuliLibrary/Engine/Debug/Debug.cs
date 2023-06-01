@@ -12,15 +12,15 @@ using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
 namespace VoxPopuliLibrary.Engine.Debug
 {
-    public static class DebugSystem
+    internal static class DebugSystem
     {
         internal static bool Opened = false;
         // progiller variable
         internal static double RenderTime = 0;
         internal static double UpdateTime = 0;
         internal static double MeshGenerationTime = 0;
-        internal static double ClearTime = 0;
         internal static double ChunkRenderTime = 0;
+        internal static double NetworkTime = 0;
         //Menu visiblity bool
         static bool PlayerMenu;
         static bool VoxelMenu;
@@ -29,7 +29,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         static bool PhysicMenu;
         //Voxel Debug Variables
         static int bx, by, bz;
-        static int blockid;
+        static string blockid = "air";
         static bool DebugChunk;
         static DebugBox ChunkBox = new DebugBox(new Vector3d(16, 16, 16), new Vector4(1f, 1f, 0f, 1f));
         //Player Debug Variables
@@ -49,7 +49,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         /// <summary>
         /// Function who draw debug menu
         /// </summary>
-        public static void DebugMenu()
+        internal static void DebugMenu()
         {
             #region BaseMenu
             ImGui.BeginMainMenuBar();
@@ -72,7 +72,7 @@ namespace VoxPopuliLibrary.Engine.Debug
                 ImGui.Text($"VoxPopuli average {1000.0f / ImGui.GetIO().Framerate:0.##} ms/frame ({ImGui.GetIO().Framerate:0.#} FPS)");
                 ImGui.Text("Rendering time :" + RenderTime + "ms");
                 ImGui.Text("Update time :" + UpdateTime + "ms");
-                ImGui.Text("Clear time :" + ClearTime + "ms");
+                ImGui.Text("Network time :" + NetworkTime + "ms");
                 ImGui.Text("Chunk rendering time :" + ChunkRenderTime + "ms");
                 ImGui.Text("Mesh generation time :" + MeshGenerationTime + "ms");
                 ImGui.EndMenu();
@@ -165,18 +165,20 @@ namespace VoxPopuliLibrary.Engine.Debug
             {
                 VoxelMenu = false;
             }
-            ImGui.Text($"Number of chunk: {ClientWorldManager.world.GetChunkManagerClient().Clist.Count}");
-            ImGui.SliderInt("Render Distance:", ref ClientWorldManager.world.RenderDistance, 2, 32);
-            ImGui.SliderInt("Vertical Render Distance:", ref ClientWorldManager.world.VerticalRenderDistance, 2, 10);
-            ImGui.InputInt("Block x:", ref bx);
-            ImGui.InputInt("Block y:", ref by);
-            ImGui.InputInt("Block z:", ref bz);
-            ImGui.InputInt("Replace block id:", ref blockid);
-            if (ImGui.Button("Send chunk modification"))
-                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(new Vector3i(bx, by, bz), (ushort)blockid);
-            ImGui.Separator();
-            ImGui.Checkbox("ChunkDebug", ref DebugChunk);
-
+            if (ClientWorldManager.Initialized)
+            {
+                ImGui.Text($"Number of chunk: {ClientWorldManager.world.GetChunkManagerClient().Clist.Count}");
+                ImGui.SliderInt("Render Distance:", ref ClientWorldManager.world.RenderDistance, 2, 32);
+                ImGui.SliderInt("Vertical Render Distance:", ref ClientWorldManager.world.VerticalRenderDistance, 2, 10);
+                ImGui.InputInt("Block x:", ref bx);
+                ImGui.InputInt("Block y:", ref by);
+                ImGui.InputInt("Block z:", ref bz);
+                ImGui.InputText("Replace block id:", ref blockid, 100);
+                if (ImGui.Button("Send chunk modification"))
+                    ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(new Vector3i(bx, by, bz), blockid);
+                ImGui.Separator();
+                ImGui.Checkbox("ChunkDebug", ref DebugChunk);
+            }
             ImGui.End();
         }
         /// <summary>
@@ -274,7 +276,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         /// Init Debug Menu system
         /// </summary>
         /// <param name="ClientSize">Client window size</param>
-        public static void Init(Vector2i ClientSize)
+        internal static void Init(Vector2i ClientSize)
         {
             Controller = new ImGuiController(ClientSize.X, ClientSize.Y);
             WireFrameView = false;
@@ -284,14 +286,14 @@ namespace VoxPopuliLibrary.Engine.Debug
         /// </summary>
         /// <param name="window">Main window</param>
         /// <param name="deltaSecond"> delta time</param>
-        public static void Update(GameWindow window, float deltaSecond)
+        internal static void Update(GameWindow window, float deltaSecond)
         {
             Controller.Update(window, deltaSecond);
         }
         /// <summary>
         /// Render Imgui
         /// </summary>
-        public static void Render()
+        internal static void Render()
         {
             Controller.Render();
         }
@@ -299,7 +301,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         /// Update Controller size
         /// </summary>
         /// <param name="ClientSize">Window size</param>
-        public static void Resize(Vector2i ClientSize)
+        internal static void Resize(Vector2i ClientSize)
         {
             Controller.WindowResized(ClientSize.X, ClientSize.Y); ;
         }
@@ -307,7 +309,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         /// Get Text Input
         /// </summary>
         /// <param name="Char">Char</param>
-        public static void Char(char Char)
+        internal static void Char(char Char)
         {
             Controller.PressChar(Char);
         }

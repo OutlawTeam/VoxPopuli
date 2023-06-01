@@ -5,94 +5,88 @@
  * */
 using LiteNetLib;
 using LiteNetLib.Utils;
+using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.Player;
 using VoxPopuliLibrary.Engine.World;
 
 namespace VoxPopuliLibrary.Engine.Network
 {
-    public class ClientNetwork
+    /// <summary>
+    /// The network manager for client
+    /// </summary>
+    public static class ClientNetwork
     {
-        //Message listener
         static EventBasedNetListener listener = new EventBasedNetListener();
-        //Client
-        internal static NetManager client = new NetManager(listener);
-        //Client Id
-        public static int id;
-        //Server peer
-        public static NetPeer Server;
-        public static string ServerGameVersion = "NotConnected";
-        public static string ServerEngineVersion = "NotConnected";
-        /// <summary>
-        /// Init Network Manager
-        /// </summary>
-        public static void Init()
+        internal static NetManager client = new NetManager(listener) { AutoRecycle = true};
+        internal static NetDataWriter message = new NetDataWriter();
+        private static NetPacketProcessor packetProcessor;
+        internal static NetPeer Server;
+        internal static string ServerGameVersion = "NotConnected";
+        internal static string ServerEngineVersion = "NotConnected";
+        internal static void Init()
         {
             client.DisconnectTimeout = 10000;
             client.Start();
+            packetProcessor = new NetPacketProcessor();
+            //
+            //API
+            //
+            packetProcessor.RegisterNestedType<InitialPacket>();
+            packetProcessor.SubscribeNetSerializable<InitialPacket>(HandleInitialPacket);
+            
+
             listener.PeerConnectedEvent += (server) =>
             {
                 Server = server;
                 ClientWorldManager.InitWorld();
+                //
+                //ChunkManager
+                //
+                packetProcessor.RegisterNestedType<OneBlockChangeDemand>();
+                packetProcessor.SubscribeNetSerializable<ServerChunkData, NetPeer>(ClientWorldManager.world.GetChunkManagerClient().HandleChunk);
+                packetProcessor.SubscribeNetSerializable<OneBlockChange, NetPeer>(ClientWorldManager.world.GetChunkManagerClient().HandleChunkUpdate);
+                packetProcessor.SubscribeNetSerializable<UnloadChunk, NetPeer>(ClientWorldManager.world.GetChunkManagerClient().HandleChunkUnload);
+                //
+                //Player
+                //
+                packetProcessor.RegisterNestedType<PlayerControl>();
+                packetProcessor.RegisterNestedType<PlayerPositionTP>();
+                packetProcessor.SubscribeNetSerializable<PlayerData, NetPeer>(ClientWorldManager.world.GetPlayerFactoryClient().HandleData);
+                packetProcessor.SubscribeNetSerializable<PlayerSpawn, NetPeer>(ClientWorldManager.world.GetPlayerFactoryClient().HandleSpawn);
+                packetProcessor.SubscribeNetSerializable<PlayerSpawnLocal, NetPeer>(ClientWorldManager.world.GetPlayerFactoryClient().HandleLocalPlayer);
+                packetProcessor.SubscribeNetSerializable<PlayerDeco, NetPeer>(ClientWorldManager.world.GetPlayerFactoryClient().HandleDeco);
             };
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, Nothing) =>
             {
-                ushort messageType = dataReader.GetUShort();
-                if (ClientWorldManager.Initialized)
-                {
-                    switch ((NetworkProtocol)messageType)
-                    {
-                        case NetworkProtocol.ChunkData:
-                            ClientWorldManager.world.GetChunkManagerClient().HandleChunk(dataReader, fromPeer);
-                            break;
-                        case NetworkProtocol.PlayerSpawnToClient:
-                            ClientWorldManager.world.GetPlayerFactoryClient().HandleSpawn(dataReader, fromPeer);
-                            break;
-                        case NetworkProtocol.ChunkOneBlockChange:
-                            ClientWorldManager.world.GetChunkManagerClient().HandleChunkUpdate(dataReader);
-                            break;
-                        case NetworkProtocol.PlayerPosition:
-                            ClientWorldManager.world.GetPlayerFactoryClient().HandleData(dataReader, fromPeer);
-                            break;
-                        case NetworkProtocol.PlayerDeco:
-                            ClientWorldManager.world.GetPlayerFactoryClient().HandleDeco(dataReader, fromPeer);
-                            break;
-                        case NetworkProtocol.PlayerLocal:
-                            ClientWorldManager.world.GetPlayerFactoryClient().AddLocalPlayer(dataReader, fromPeer);
-                            break;
-                        case NetworkProtocol.ServerVersionSend:
-                            HandleVersion(dataReader, fromPeer);
-                            break;
-                        default:
-                            // handle unknown value
-                            break;
-                    }
-                }
-                dataReader.Recycle();
+                packetProcessor.ReadAllPackets(dataReader,fromPeer);
             };
         }
-        internal static void HandleVersion(NetDataReader data, NetPeer peer)
-        {
-            ServerEngineVersion = data.GetString();
-            ServerGameVersion = data.GetString();
-        }
         /// <summary>
-        /// Connect the client to the server
+        /// Send a packet to the server
         /// </summary>
-        /// <param name="ip">Ip of the Server</param>
-        public static void Connect(string ip, int port)
-        {
-            client.Connect(ip, port, "");
-        }
-        public static void DeConnect()
+        /// <typeparam name="T">A struct who implement INetSerialize</typeparam>
+        /// <param name="packet">The packet variable</param>
+        /// <param name="deliveryMethod">DeliveryMethod</param>
+        public static void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
             if (Server != null)
             {
-                Server.Disconnect();
+                message.Reset();
+                packetProcessor.WriteNetSerializable(message, ref packet);
+                Server.Send(message, deliveryMethod);
             }
         }
-        /// <summary>
-        /// Update Network Manager
-        /// </summary>
-        public static void Update()
+        internal static void HandleInitialPacket(InitialPacket data)
+        {
+            ServerEngineVersion = data.EngineVersion;
+            ServerGameVersion = data.GameVersion;
+        }
+        internal static void Connect(string ip, int port)
+        {
+            
+            client.Connect(ip, port, "");
+        }
+        internal static void Update()
         {
             client.PollEvents();
         }

@@ -4,8 +4,8 @@
  * Author Florian Pfeiffer
  */
 using LiteNetLib;
-using LiteNetLib.Utils;
 using OpenTK.Mathematics;
+using VoxPopuliLibrary.Engine.Network;
 namespace VoxPopuliLibrary.Engine.Player
 {
     internal class ServerPlayerFactory
@@ -18,54 +18,22 @@ namespace VoxPopuliLibrary.Engine.Player
             {
                 if (otherPlayer.ClientID != peer.Id)
                 {
-                    SendPlayersToClient(otherPlayer, peer);
+                    PlayerSpawn packet = new PlayerSpawn { ClientID = otherPlayer.ClientID, Position = otherPlayer.Position };
+                    ServerNetwork.SendPacket(packet, peer, DeliveryMethod.ReliableOrdered);
                 }
             }
             List.Add(clientId, temp);
-            SendPlayerToLocal(temp, peer);
-            SendPlayerToAll(temp, peer);
+            PlayerSpawnLocal packets = new PlayerSpawnLocal { ClientID = temp.ClientID, Position = temp.Position };
+            ServerNetwork.SendPacket(packets, peer, DeliveryMethod.ReliableOrdered);
+
+            PlayerSpawn packety = new PlayerSpawn { ClientID = temp.ClientID, Position = temp.Position };
+            ServerNetwork.SendPacketToAllWithoutOnePeer(packety,peer, DeliveryMethod.ReliableOrdered);
         }
         internal void RemovePlayer(ushort clientId)
         {
-            SendPlayersDecoToClient(clientId);
+            PlayerDeco packet = new PlayerDeco {  ClientID = clientId };
+            ServerNetwork.SendPacketToAll(packet, DeliveryMethod.ReliableOrdered);
             List.Remove(clientId);
-        }
-        public void SendPlayersDecoToClient(ushort ClientId)
-        {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(Network.NetworkProtocol.PlayerDeco));
-            message.Put(ClientId);
-            Network.ServerNetwork.server.SendToAll(message, DeliveryMethod.ReliableOrdered);
-        }
-        public void SendPlayersToClient(Player et, NetPeer peer)
-        {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(Network.NetworkProtocol.PlayerSpawnToClient));
-            message.Put(et.ClientID);
-            message.Put(et.Position.X);
-            message.Put(et.Position.Y);
-            message.Put(et.Position.Z);
-            peer.Send(message, DeliveryMethod.ReliableUnordered);
-        }
-        public void SendPlayerToAll(Player et, NetPeer peer)
-        {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(Network.NetworkProtocol.PlayerSpawnToClient));
-            message.Put(et.ClientID);
-            message.Put(et.Position.X);
-            message.Put(et.Position.Y);
-            message.Put(et.Position.Z);
-            Network.ServerNetwork.server.SendToAll(message, DeliveryMethod.ReliableOrdered, peer);
-        }
-        public void SendPlayerToLocal(Player et, NetPeer peer)
-        {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(Network.NetworkProtocol.PlayerLocal));
-            message.Put(et.ClientID);
-            message.Put(et.Position.X);
-            message.Put(et.Position.Y);
-            message.Put(et.Position.Z);
-            peer.Send(message, DeliveryMethod.ReliableOrdered);
         }
         internal void Update(float DT)
         {
@@ -82,29 +50,29 @@ namespace VoxPopuliLibrary.Engine.Player
             }
         }
 
-        internal void HandleControl(NetDataReader data, NetPeer peer)
+        internal void HandleControl(PlayerControl data, NetPeer peer)
         {
             if (List.TryGetValue((ushort)peer.Id, out Player player))
             {
-                player.forward = data.GetBool();
-                player.backward = data.GetBool();
-                player.right = data.GetBool();
-                player.left = data.GetBool();
-                player.space = data.GetBool();
-                player.shift = data.GetBool();
-                player.control = data.GetBool();
-                player.Rotation = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
-                player.Front = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
-                player.Right = new Vector3(data.GetFloat(), data.GetFloat(), data.GetFloat());
-                player.Elevation = data.GetFloat();
-                player.Fly = data.GetBool();
+                player.forward = data.Forward;
+                player.backward = data.Backward;
+                player.right = data.Right;
+                player.left = data.Left;
+                player.space = data.Space;
+                player.shift = data.Shift;
+                player.control = data.Control;
+                player.Rotation = data.Rotation;
+                player.Front = data.Front;
+                player.Right = data.CRight;
+                player.Elevation = data.Elevation;
+                player.Fly = data.Fly;
             }
         }
-        internal void HandlePos(NetDataReader data, NetPeer peer)
+        internal void HandlePos(PlayerPositionTP data, NetPeer peer)
         {
             if (List.TryGetValue((ushort)peer.Id, out Player player))
             {
-                player.Position = new Vector3d(data.GetDouble(), data.GetDouble(), data.GetDouble());
+                player.Position = data.Position;
             }
         }
     }

@@ -1,22 +1,43 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.Player;
 using VoxPopuliLibrary.Engine.World;
-
 namespace VoxPopuliLibrary.Engine.Network
 {
-    internal static class ServerNetwork
+    /// <summary>
+    /// The network manager for server
+    /// </summary>
+    public static class ServerNetwork
     {
-        internal static NetDataWriter message;
+        internal static NetDataWriter message= new NetDataWriter();
         internal static NetManager server;
-        internal static readonly NetPacketProcessor _netPacketProcessor = new NetPacketProcessor();
-
+        internal static readonly NetPacketProcessor PacketProcessor = new NetPacketProcessor();
         internal static void StartServer(int Port)
         {
-            message = new NetDataWriter();
             EventBasedNetListener listener = new EventBasedNetListener();
-            server = new NetManager(listener);
-            server.DisconnectTimeout = 60000;
-
+            server = new NetManager(listener) {AutoRecycle = true,DisconnectTimeout = 10000};
+            //
+            //API
+            //
+            PacketProcessor.RegisterNestedType<InitialPacket>();
+            //
+            //ChunkManager
+            //
+            PacketProcessor.RegisterNestedType<OneBlockChange>();
+            PacketProcessor.RegisterNestedType<ServerChunkData>();
+            PacketProcessor.RegisterNestedType<UnloadChunk>();
+            PacketProcessor.SubscribeNetSerializable<OneBlockChangeDemand,NetPeer>(
+                ServerWorldManager.world.GetChunkManagerServer().HandleBlockChange);
+            //
+            //Player
+            //
+            PacketProcessor.RegisterNestedType<PlayerData>();
+            PacketProcessor.RegisterNestedType<PlayerSpawn>();
+            PacketProcessor.RegisterNestedType<PlayerSpawnLocal>();
+            PacketProcessor.RegisterNestedType<PlayerDeco>();
+            PacketProcessor.SubscribeNetSerializable<PlayerControl, NetPeer>(ServerWorldManager.world.GetPlayerFactoryServer().HandleControl);
+            PacketProcessor.SubscribeNetSerializable<PlayerPositionTP, NetPeer>(ServerWorldManager.world.GetPlayerFactoryServer().HandlePos);
 
             listener.ConnectionRequestEvent += request =>
             {
@@ -26,30 +47,16 @@ namespace VoxPopuliLibrary.Engine.Network
             {
                 Console.WriteLine("A player was connectected: {0}", peer.EndPoint); // Show peer ip
                 ServerWorldManager.world.GetPlayerFactoryServer().AddPlayer((ushort)peer.Id, peer);       // Send with reliability
-                SendVersion(peer);
+                InitialPacket packet = new InitialPacket
+                {
+                    EngineVersion = API.Version.EngineVersion,
+                    GameVersion = API.Version.GameVersion
+                };
+                SendPacket(packet, peer, DeliveryMethod.ReliableOrdered);
             };
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, Nothing) =>
             {
-                ushort messageType = dataReader.GetUShort();
-                switch ((NetworkProtocol)messageType)
-                {
-                    case NetworkProtocol.ChunkDemand:
-                        ServerWorldManager.world.GetChunkManagerServer().HandleChunk(dataReader, fromPeer);
-                        break;
-                    case NetworkProtocol.ChunkOneBlockChangeDemand:
-                        ServerWorldManager.world.GetChunkManagerServer().HandleBlockChange(dataReader, fromPeer);
-                        break;
-                    case NetworkProtocol.PlayerSendControl:
-                        ServerWorldManager.world.GetPlayerFactoryServer().HandleControl(dataReader, fromPeer);
-                        break;
-                    case NetworkProtocol.PlayerClientSendPos:
-                        ServerWorldManager.world.GetPlayerFactoryServer().HandlePos(dataReader, fromPeer);
-                        break;
-                    default:
-                        // handle unknown value
-                        break;
-                }
-                dataReader.Recycle();
+                PacketProcessor.ReadAllPackets(dataReader,fromPeer);
             };
             listener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
             {
@@ -58,17 +65,50 @@ namespace VoxPopuliLibrary.Engine.Network
             };
             server.Start(Port);
         }
+        /// <summary>
+        /// Send packet to a specific client
+        /// </summary>
+        /// <typeparam name="T">A struct who implement INetSerialize</typeparam>
+        /// <param name="packet">The packet</param>
+        /// <param name="peer">The peer</param>
+        /// <param name="deliveryMethod">The DeliveryMethod</param>
+        public static void SendPacket<T>(T packet, NetPeer peer, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            if (peer != null)
+            {
+                message.Reset();
+                PacketProcessor.WriteNetSerializable(message, ref packet);
+                peer.Send(message, deliveryMethod);
+            }
+        }
+        /// <summary>
+        /// Send packet to all client
+        /// </summary>
+        /// <typeparam name="T">A struct who implement INetSerialize</typeparam>
+        /// <param name="packet">The packet</param>
+        /// <param name="deliveryMethod">The DeliveryMethod</param>
+        public static void SendPacketToAll<T>(T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            message.Reset();
+            PacketProcessor.WriteNetSerializable(message, ref packet);
+            server.SendToAll(message, deliveryMethod);
+        }
+        /// <summary>
+        /// Send a packet to all client exclude one
+        /// </summary>
+        /// <typeparam name="T">A struct who implement INetSerialize</typeparam>
+        /// <param name="packet">The packet</param>
+        /// <param name="peer">The excluded peer</param>
+        /// <param name="deliveryMethod">The DeliveryMethod</param>
+        public static void SendPacketToAllWithoutOnePeer<T>(T packet, NetPeer peer,DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            message.Reset();
+            PacketProcessor.WriteNetSerializable(message, ref packet);
+            server.SendToAll(message, deliveryMethod,peer);
+        }
         internal static void Update()
         {
             server.PollEvents();
-        }
-        internal static void SendVersion(NetPeer peer)
-        {
-            NetDataWriter message = new NetDataWriter();
-            message.Put(Convert.ToUInt16(NetworkProtocol.ServerVersionSend));
-            message.Put(API.Version.EngineVersion);
-            message.Put(API.Version.GameVersion);
-            peer.Send(message, DeliveryMethod.ReliableOrdered);
         }
     }
 }

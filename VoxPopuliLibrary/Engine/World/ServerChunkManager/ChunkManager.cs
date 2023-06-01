@@ -4,23 +4,25 @@
  * Author Florian Pfeiffer
  */
 using OpenTK.Mathematics;
+using VoxPopuliLibrary.Engine.Network;
+using LiteNetLib;
+using VoxPopuliLibrary.Engine.Maths;
+using System.Net.Sockets;
 
 namespace VoxPopuliLibrary.Engine.World
 {
     internal partial class ServerChunkManager
     {
         internal Dictionary<Vector3i, Chunk> clist = new Dictionary<Vector3i, Chunk>();
-        internal List<Vector3i> ChunkToBeAdded = new List<Vector3i>();
+        internal Queue<ServerChunkData> ChunkToBeSend = new Queue<ServerChunkData>();
         internal void Update()
         {
-            ChunkToBeAdded.Clear();
-            foreach (Chunk chunk in clist.Values)
+            for(int x= 0;x <=10;x++)
             {
-                if (chunk.Used == false)
+                if(ChunkToBeSend.TryDequeue(out ServerChunkData packet))
                 {
-                    clist.Remove(chunk.Position);
+                    ServerNetwork.SendPacket(packet, packet.peer, DeliveryMethod.ReliableOrdered);
                 }
-                chunk.Used = false;
             }
             foreach (Player.Player player in ServerWorldManager.world.GetPlayerFactoryServer().List.Values)
             {
@@ -38,22 +40,57 @@ namespace VoxPopuliLibrary.Engine.World
                         {
                             if (!clist.TryGetValue(new Vector3i(x, y, z), out Chunk Nothing))
                             {
-                                ChunkToBeAdded.Add(new Vector3i(x, y, z));
+                                Chunk tempChunk = new Chunk(new Vector3i(x, y, z));
+                                tempChunk.Used = true;
+                                tempChunk.PlayerInChunk.Add(player);
+                                clist.Add(new Vector3i(x, y, z), tempChunk);
+                                ServerChunkData chunkData = new ServerChunkData();
+                                chunkData.x = x;
+                                chunkData.y = y;
+                                chunkData.z = z;
+                                chunkData.data = new ChunkData { data = tempChunk.Blocks, pal = tempChunk.ChunkPalette };
+                                chunkData.peer = ServerNetwork.server.GetPeerById(player.ClientID);
+                                ChunkToBeSend.Enqueue(chunkData);
                             }
                             else
                             {
                                 Nothing.Used = true;
+                                Nothing.PlayerInChunk.Add(player);
                             }
                         }
                     }
                 }
             }
-            foreach (Vector3i pos in ChunkToBeAdded)
+            Vector3i[] keys = clist.Keys.ToArray();
+            foreach(Vector3i key in keys)
             {
-                if (!clist.TryGetValue(pos, out Chunk Nothing))
+                Chunk ch = clist[key];
+                if(!ch.Used)
                 {
-                    CreateChunk(pos);
+                    UnloadChunk packet = new UnloadChunk {x= key.X,y=key.Y,z=key.Z };
+                    foreach(Player.Player play in ch.PlayerInChunk)
+                    {
+                        ServerNetwork.SendPacket(packet,ServerNetwork.server.GetPeerById(play.ClientID),
+                            DeliveryMethod.ReliableOrdered);
+                    }
+                    clist.Remove(key);
                 }
+                ch.PlayerInChunk.Clear();
+                ch.Used = false;
+            }
+        }
+        internal bool GetBlock(int x, int y, int z, out string id)
+        {
+            (Vector3i cpos, Vector3i bpos) = Coord.GetVoxelCoord(x, y, z);
+            if (clist.TryGetValue(cpos, out Chunk ch))
+            {
+                id = ch.GetBlock(bpos.X, bpos.Y, bpos.Z);
+                return true;
+            }
+            else
+            {
+                id = "air";
+                return false;
             }
         }
     }

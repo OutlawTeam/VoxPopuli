@@ -12,12 +12,12 @@ using VoxPopuliLibrary.Engine.World;
 
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
-    public static class RenderSystem
+    internal static class RenderSystem
     {
         /// <summary>
         /// Init Graphic
         /// </summary>
-        public static void Init(GameWindow window)
+        internal static void Init(GameWindow window)
         {
             window.CursorState = CursorState.Grabbed;
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);

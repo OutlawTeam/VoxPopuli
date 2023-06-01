@@ -8,11 +8,11 @@ using StbImageSharp;
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
     // A helper class, much like Shader, meant to simplify loading textures.
-    public class Texture
+    internal class Texture
     {
-        public readonly int Handle;
+        internal readonly int Handle;
 
-        public static Texture LoadFromFile(string path)
+        internal static Texture LoadFromFile(string path)
         {
             // Generate handle
             int handle = GL.GenTexture();
@@ -34,7 +34,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             return new Texture(handle);
         }
-        public static Texture LoadFromData(Image<Rgba32> image)
+        internal static Texture LoadFromData(Image<Rgba32> image)
         {
             // Generate handle
             int handle = GL.GenTexture();
@@ -55,12 +55,12 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             return new Texture(handle);
         }
 
-        public Texture(int glHandle)
+        internal Texture(int glHandle)
         {
             Handle = glHandle;
         }
 
-        public void Use(TextureUnit unit)
+        internal void Use(TextureUnit unit)
         {
             GL.ActiveTexture(unit);
             GL.BindTexture(TextureTarget.Texture2D, Handle);

@@ -9,16 +9,6 @@ using VoxPopuliLibrary.Engine.Physics;
 
 namespace VoxPopuliLibrary.Engine.API
 {
-    public enum BlockFace
-    {
-        Top,
-        Bottom,
-        Left,
-        Right,
-        Front,
-        Back
-    }
-
     internal class Block
     {
         internal float[] texture0;

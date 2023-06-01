@@ -24,9 +24,11 @@ namespace VoxPopuliLibrary.Engine.Program
     {
         //Debug menu
         private bool DebugMenu = false;
+        
         // Créer une instance de Stopwatch
         Stopwatch RenderProfiler = new Stopwatch();
         Stopwatch UpdateProfiler = new Stopwatch();
+        Stopwatch NetworkProfiler = new Stopwatch();
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
         {
@@ -69,9 +71,13 @@ namespace VoxPopuliLibrary.Engine.Program
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            base.OnUpdateFrame(e);
             UpdateProfiler.Start();
+            base.OnUpdateFrame(e);
+            NetworkProfiler.Start();
             ClientNetwork.Update();
+            NetworkProfiler.Stop();
+            DebugSystem.NetworkTime = NetworkProfiler.ElapsedMilliseconds;
+            NetworkProfiler.Reset();
             var input = KeyboardState;
             var mouse = MouseState;
             InputSystem.Update(input, mouse, e);
