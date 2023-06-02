@@ -34,7 +34,8 @@ namespace VoxPopuliLibrary.Engine.World
         }
         internal void HandleChunkUpdate(OneBlockChange data,NetPeer peer)
         {
-            Vector3i cpos = new Vector3i(data.cx, data.cy, data.cy);
+            Console.WriteLine("ChunkModification");
+            Vector3i cpos = new Vector3i(data.cx, data.cy, data.cz);
             Vector3i bpos = new Vector3i(data.bx, data.by, data.bz);
             if (Clist.TryGetValue(cpos, out Chunk ch))
             {

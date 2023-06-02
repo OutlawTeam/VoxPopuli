@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.Network;
 using LiteNetLib;
 using VoxPopuliLibrary.Engine.Maths;
-using System.Net.Sockets;
+using VoxPopuliLibrary.Engine.Player;
 
 namespace VoxPopuliLibrary.Engine.World
 {
@@ -54,8 +54,22 @@ namespace VoxPopuliLibrary.Engine.World
                             }
                             else
                             {
-                                Nothing.Used = true;
-                                Nothing.PlayerInChunk.Add(player);
+                                if(!Nothing.PlayerInChunk.Contains(player))
+                                {
+                                    Nothing.Used = true;
+                                    Nothing.PlayerInChunk.Add(player);
+                                    ServerChunkData chunkData = new ServerChunkData();
+                                    chunkData.x = x;
+                                    chunkData.y = y;
+                                    chunkData.z = z;
+                                    chunkData.data = new ChunkData { data = Nothing.Blocks, pal = Nothing.ChunkPalette };
+                                    chunkData.peer = ServerNetwork.server.GetPeerById(player.ClientID);
+                                    ChunkToBeSend.Enqueue(chunkData);
+                                }
+                                else
+                                {
+                                    Nothing.Used = true;
+                                }
                             }
                         }
                     }
@@ -65,17 +79,30 @@ namespace VoxPopuliLibrary.Engine.World
             foreach(Vector3i key in keys)
             {
                 Chunk ch = clist[key];
-                if(!ch.Used)
+                for(int i = 0; i<ch.PlayerInChunk.Count; i++)
                 {
-                    UnloadChunk packet = new UnloadChunk {x= key.X,y=key.Y,z=key.Z };
-                    foreach(Player.Player play in ch.PlayerInChunk)
+                    Player.Player play = ch.PlayerInChunk[i];
+                    int minx = (int)(play.Position.X / 16) - ServerWorldManager.world.LoadDistance;
+                    int miny = (int)(play.Position.Y / 16) - ServerWorldManager.world.VerticalLoadDistance;
+                    int minz = (int)(play.Position.Z / 16) - ServerWorldManager.world.LoadDistance;
+                    int maxx = (int)(play.Position.X / 16) + ServerWorldManager.world.LoadDistance;
+                    int maxy = (int)(play.Position.Y / 16) + ServerWorldManager.world.VerticalLoadDistance;
+                    int maxz = (int)(play.Position.Z / 16) + ServerWorldManager.world.LoadDistance;
+                    if (!(ch.Position.X >= minx && ch.Position.Y >= miny && ch.Position.Z >= minz
+                        && ch.Position.X <= maxx && ch.Position.Y <= maxy && ch.Position.X <= maxz) 
+                        && ch.PlayerInChunk.Contains(play))
                     {
-                        ServerNetwork.SendPacket(packet,ServerNetwork.server.GetPeerById(play.ClientID),
+                        UnloadChunk packet = new UnloadChunk { x = key.X, y = key.Y, z = key.Z };
+                        ch.PlayerInChunk.Remove(play);
+                        ServerNetwork.SendPacket(packet, ServerNetwork.server.GetPeerById(play.ClientID),
                             DeliveryMethod.ReliableOrdered);
                     }
+                }
+                if (!ch.Used ||ch.PlayerInChunk.Count ==0)
+                {
+                    
                     clist.Remove(key);
                 }
-                ch.PlayerInChunk.Clear();
                 ch.Used = false;
             }
         }
@@ -91,6 +118,31 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 id = "air";
                 return false;
+            }
+        }
+        internal void HandleBlockChange(OneBlockChangeDemand data, NetPeer peer)
+        {
+            
+            if (clist.TryGetValue(new Vector3i(data.cx, data.cy, data.cz), out Chunk tempChunk))
+            {
+                tempChunk.SetBlock(data.bx, data.by, data.bz, data.BlockID);
+                OneBlockChange packet = new OneBlockChange
+                {
+                    cx = data.cx,
+                    cy = data.cy,
+                    cz = data.cz,
+                    bx = data.bx,
+                    by = data.by,
+                    bz = data.bz,
+                    BlockID = data.BlockID
+                };
+                ServerNetwork.SendPacket(packet,peer, DeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                tempChunk = new Chunk(new Vector3i(data.cx, data.cy, data.cz));
+                clist.Add(new Vector3i(data.cx, data.cy, data.cz), tempChunk);
+                clist[new Vector3i(data.cx, data.cy, data.cz)].SetBlock(data.bx, data.by, data.bz, data.BlockID);
             }
         }
     }

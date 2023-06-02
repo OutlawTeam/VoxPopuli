@@ -7,6 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 namespace VoxPopuliLibrary.Engine.Debug
 {
@@ -133,7 +134,7 @@ void main()
 
             _fontTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _fontTexture);
-            GL.TexStorage2D(TextureTarget2d.Texture2D, mips, SizedInternalFormat.Rgb8, width, height);
+            GL.TexStorage2D(TextureTarget2d.Texture2D, mips, SizedInternalFormat.Rgba8, width, height);
             LabelObject(ObjectLabelIdentifier.Texture, _fontTexture, "ImGui Text Atlas");
 
             GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, width, height, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
@@ -244,7 +245,7 @@ void main()
             PressedChars.Add(keyChar);
         }
 
-        public void MouseScroll(Vector2 offset)
+        internal void MouseScroll(Vector2 offset)
         {
             ImGuiIOPtr io = ImGui.GetIO();
 
@@ -477,8 +478,9 @@ void main()
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out int success);
             if (success == 0)
             {
+                /*
                 string info = GL.GetProgramInfoLog(program);
-                Console.WriteLine($"GL.LinkProgram had info log [{name}]:\n{info}");
+                Debug.WriteLine($"GL.LinkProgram had info log [{name}]:\n{info}");*/
             }
 
             GL.DetachShader(program, vertex);
@@ -501,21 +503,20 @@ void main()
             GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
             {
-                string info = GL.GetShaderInfoLog(shader);
-                Console.WriteLine($"GL.CompileShader for shader '{name}' [{type}] had info log:\n{info}");
+                string info = GL.GetShaderInfoLog(shader);/*
+                Debug.WriteLine($"GL.CompileShader for shader '{name}' [{type}] had info log:\n{info}");*/
             }
 
             return shader;
         }
-
+        
         public static void CheckGLError(string title)
-        {
-            /*
+        {/*
             ErrorCode error;
             int i = 1;
             while ((error = GL.GetError()) != ErrorCode.NoError)
             {
-                //Console.WriteLine($"{title} ({i++}): {error}");
+                Debug.Print($"{title} ({i++}): {error}");
             }*/
         }
     }
