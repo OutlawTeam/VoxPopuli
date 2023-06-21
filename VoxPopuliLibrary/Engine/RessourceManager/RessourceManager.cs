@@ -3,7 +3,7 @@ using VoxPopuliLibrary.Engine.Physics;
 
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
-    internal static partial class RessourceManager
+    public static partial class RessourceManager
     {
         private static Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>();
         private static Dictionary<string, Texture> Textures = new Dictionary<string, Texture>();
@@ -14,8 +14,9 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
         private static Dictionary<string, Collider[]> Colliders = new Dictionary<string, Collider[]>();
         private static Texture VoxelAtlas;
         private static Dictionary<string, float[]> BlockAtlasTexture = new Dictionary<string, float[]>();
+        private static Dictionary<string, FreeTypeFont> Fonts = new Dictionary<string, FreeTypeFont>();
 
-        internal static void LoadRessources()
+        internal static void LoadRessourcesClient()
         {
             LoadShaders();
             LoadTextures();
@@ -24,6 +25,11 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
             LoadCubeMapTextures();
             LoadBlockMeshs();
             LoadModels();
+            LoadColliders();
+            LoadFonts();
+        }
+        internal static void LoadRessourcesServer()
+        {
             LoadColliders();
         }
 

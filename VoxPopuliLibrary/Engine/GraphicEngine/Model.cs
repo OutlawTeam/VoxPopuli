@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
-    internal struct Model
+    public struct Model
     {
         internal int Vao;
         internal float[] _Vertices;

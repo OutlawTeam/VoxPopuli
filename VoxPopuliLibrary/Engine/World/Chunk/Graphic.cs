@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.GraphicEngine;
 
 namespace VoxPopuliLibrary.Engine.World
 {
@@ -47,7 +48,7 @@ namespace VoxPopuliLibrary.Engine.World
                     {
                         if (GetBlock(x, y, z) != "air")
                         {
-                            if (BlockManager.BlockList[GetBlock(x, y, z)].Cube)
+                            if (BlockRegister.BlockList[GetBlock(x, y, z)].GetRenderType()==BlockRenderType.Block)
                             {
                                 GenerateDirection(0, x, y, z);
                                 GenerateDirection(1, x, y, z);
@@ -55,7 +56,7 @@ namespace VoxPopuliLibrary.Engine.World
                             }
                             else
                             {
-                                for (int i = 0; i < BlockManager.BlockList[GetBlock(x, y, z)].Mesh.GetMesh().Length; i++)
+                                for (int i = 0; i < RessourceManager.RessourceManager.GetBlockMesh(BlockRegister.BlockList[GetBlock(x, y, z)].GetMesh()).GetMesh().Length; i++)
                                 {
                                     AddMeshFace(GetBlock(x, y, z), x, y, z, i);
                                 }
@@ -86,28 +87,28 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 if (y == ClientWorldManager.world.CHUNK_SIZE - 1)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y + 1, Position.Z).GetBlock(x, 0, z)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y + 1, Position.Z).GetBlock(x, 0, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 0);
                     }
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x, y + 1, z)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x, y + 1, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 0);
                     }
                 }
                 if (y == 0)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y - 1, Position.Z).GetBlock(x, ClientWorldManager.world.CHUNK_SIZE - 1, z)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y - 1, Position.Z).GetBlock(x, ClientWorldManager.world.CHUNK_SIZE - 1, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 1);
                     }
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x, y - 1, z)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x, y - 1, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 1);
                     }
@@ -117,28 +118,28 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 if (z == ClientWorldManager.world.CHUNK_SIZE - 1)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y, Position.Z + 1).GetBlock(x, y, 0)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y, Position.Z + 1).GetBlock(x, y, 0)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 2);
                     }
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x, y, z + 1)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x, y, z + 1)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 2);
                     }
                 }
                 if (z == 0)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y, Position.Z - 1).GetBlock(x, y, ClientWorldManager.world.CHUNK_SIZE - 1)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X, Position.Y, Position.Z - 1).GetBlock(x, y, ClientWorldManager.world.CHUNK_SIZE - 1)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 3);
                     }
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x, y, z - 1)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x, y, z - 1)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 3);
                     }
@@ -148,21 +149,21 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 if (x == ClientWorldManager.world.CHUNK_SIZE - 1)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X + 1, Position.Y, Position.Z).GetBlock(0, y, z)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X + 1, Position.Y, Position.Z).GetBlock(0, y, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 4);
                     }
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x + 1, y, z)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x + 1, y, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 4);
                     }
                 }
                 if (x == 0)
                 {
-                    if (BlockManager.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X - 1, Position.Y, Position.Z).GetBlock(ClientWorldManager.world.CHUNK_SIZE - 1, y, z)))
+                    if (BlockRegister.BlockTransparent(ClientWorldManager.world.GetChunkManagerClient().GetChunk(Position.X - 1, Position.Y, Position.Z).GetBlock(ClientWorldManager.world.CHUNK_SIZE - 1, y, z)))
                     {
 
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 5);
@@ -170,7 +171,7 @@ namespace VoxPopuliLibrary.Engine.World
                 }
                 else
                 {
-                    if (BlockManager.BlockTransparent(GetBlock(x - 1, y, z)))
+                    if (BlockRegister.BlockTransparent(GetBlock(x - 1, y, z)))
                     {
                         AddMeshFace(GetBlock(x, y, z), x, y, z, 5);
                     }
@@ -188,8 +189,8 @@ namespace VoxPopuliLibrary.Engine.World
 
         private void AddMeshFace(string Block, int x, int y, int z, int BF)
         {
-            var Vert = BlockManager.BlockMesh(Block, BF);
-            var Tex = BlockManager.GetTex(Block, BF);
+            var Vert = BlockRegister.BlockMesh(Block, BF);
+            var Tex = BlockRegister.GetTexture(Block, BF);
             for (int i = 0; i < 4; i++)
             {
                 Vertice.Add(Vert[i * 3] + x);
@@ -197,6 +198,8 @@ namespace VoxPopuliLibrary.Engine.World
                 Vertice.Add(Vert[i * 3 + 2] + z);
                 Vertice.Add(Tex[i * 2]);
                 Vertice.Add(Tex[i * 2 + 1]);
+                Vertice.Add(CalculateAO(new Vector3(Vert[i * 3], Vert[i * 3 + 1], Vert[i * 3 + 2]),new Vector3i(x,y,z)));
+
             }
             uint[] indice = { 0, 1, 2, 0, 2, 3 };
             for (uint i = 0; i < 6; i++)
@@ -206,8 +209,20 @@ namespace VoxPopuliLibrary.Engine.World
             indices.AddRange(indice);
             IndexCounter += 4;
         }
-        private int GenOcclusion(int side1, int side2, int corner)
+        private int CalculateAO(Vector3 vertpos,Vector3i bpos)
         {
+            int StepY = vertpos.Y  <= 0.5 ? -1: 1;
+            int StepX = vertpos.X  <= 0.5 ? -1: 1;
+            int StepZ = vertpos.Z  <= 0.5 ? -1: 1;
+            string Side1 = ClientWorldManager.world.GetChunkManagerClient().
+                GetBlockForMesh(new Vector3i(bpos.X +StepX,bpos.Y+StepY,bpos.Z),Position);
+            string Side2 = ClientWorldManager.world.GetChunkManagerClient().
+                GetBlockForMesh(new Vector3i(bpos.X, bpos.Y + StepY, bpos.Z + StepZ), Position);
+            string Corner = ClientWorldManager.world.GetChunkManagerClient().
+                GetBlockForMesh(new Vector3i(bpos.X+ StepX, bpos.Y + StepY, bpos.Z + StepZ), Position);
+            int side1 = BlockRegister.BlockTransparent(Side1) == false ?  1:0;
+            int side2 = BlockRegister.BlockTransparent(Side2) == false ? 1 : 0;
+            int corner = BlockRegister.BlockTransparent(Corner) == false ? 1 : 0;
             if (side1 == 1 && side2 == 1)
             {
                 return 0;
@@ -225,10 +240,13 @@ namespace VoxPopuliLibrary.Engine.World
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * sizeof(float), Vertices, BufferUsageHint.StaticDraw);
             var vertexLocation = RessourceManager.RessourceManager.GetShader("Chunk").GetAttribLocation("Vertex");
             GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
             var texCoordLocation = RessourceManager.RessourceManager.GetShader("Chunk").GetAttribLocation("Texture");
             GL.EnableVertexAttribArray(texCoordLocation);
-            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+            var AOLocation = RessourceManager.RessourceManager.GetShader("Chunk").GetAttribLocation("AO");
+            GL.EnableVertexAttribArray(AOLocation);
+            GL.VertexAttribPointer(AOLocation, 1, VertexAttribPointerType.Float, false, 6 * sizeof(float), 5 * sizeof(float));
             //EBO
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(uint), indices.ToArray(), BufferUsageHint.StaticDraw);

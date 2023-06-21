@@ -7,6 +7,8 @@ using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
+using System.Security.Principal;
+using VoxPopuliLibrary.Engine.API;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
@@ -15,6 +17,9 @@ namespace VoxPopuliLibrary.Engine.Debug
     internal static class DebugSystem
     {
         internal static bool Opened = false;
+        internal static int x;
+        internal static int y;
+        internal static bool Fullscreen;
         // progiller variable
         internal static double RenderTime = 0;
         internal static double UpdateTime = 0;
@@ -34,8 +39,11 @@ namespace VoxPopuliLibrary.Engine.Debug
         static DebugBox ChunkBox = new DebugBox(new Vector3d(16, 16, 16), new Vector4(1f, 1f, 0f, 1f));
         //Player Debug Variables
         static float px = 0, py = 300, pz = 0;
+        static bool ShowViewRay;
+        static float Fov;
         //Render Debug Variables
         static bool WireFrameView;
+        static bool DebugFont;
         //Network debug variable 
         static string ip = "localhost";
         static int port = 23482;
@@ -44,7 +52,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         //Imgui Controller
         static ImGuiController Controller;
 
-        static Thread ServerLocalThread = new Thread(Program.Program.Main);
+        static Thread ServerLocalThread = new Thread(() => Program.Program.Main(false));
 
         /// <summary>
         /// Function who draw debug menu
@@ -59,6 +67,11 @@ namespace VoxPopuliLibrary.Engine.Debug
             }
             if (ImGui.BeginMenu("Windows"))
             {
+                ImGui.InputInt("Window X Size", ref x);
+                ImGui.SameLine();
+                ImGui.InputInt("Window Y Size", ref y);
+                if (ImGui.Button("Resize")) { API.API.ResizeWindow(x, y); }
+                if(ImGui.Checkbox("Fullscreen",ref Fullscreen)) { API.API.SetFullscreen(Fullscreen); };
                 if (ImGui.MenuItem("PlayerMenu")) { PlayerMenu = true; }
                 if (ImGui.MenuItem("Voxel Menu")) { VoxelMenu = true; }
                 if (ImGui.MenuItem("Network Menu")) { NetMenu = true; }
@@ -80,10 +93,9 @@ namespace VoxPopuliLibrary.Engine.Debug
             if (ImGui.BeginMenu("Info"))
             {
                 ImGui.Text("Game Version:");
-                ImGui.Text("Client game version: " + API.Version.GameVersion);
                 ImGui.Text("Client engine version: " + API.Version.EngineVersion);
                 ImGui.Text("Client api version: " + API.Version.APIVersion);
-                ImGui.Text("Server game version: " + ClientNetwork.ServerGameVersion);
+                ImGui.Text("Server api version: " + ClientNetwork.ServerAPIVersion);
                 ImGui.Text("Server engine version: " + ClientNetwork.ServerEngineVersion);
                 ImGui.EndMenu();
             }
@@ -135,24 +147,33 @@ namespace VoxPopuliLibrary.Engine.Debug
             {
                 PlayerMenu = false;
             }
+            ImGui.InputText("Name", ref Account.Name, 100);
             ImGui.SeparatorText("Local Player");
-            if (ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayerExist)
+            if (ClientWorldManager.Initialized)
             {
-                ImGui.Text($"Player Position: {ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position}");
-                ImGui.SliderFloat("FOV", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer._Camera._fov, MathHelper.PiOver3, MathHelper.PiOver2);
-                ImGui.InputInt("Selected Block", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SelectedBlock);
-                ImGui.Checkbox("Fly", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Fly);
-                ImGui.InputFloat("x", ref px);
-                ImGui.InputFloat("y", ref py);
-                ImGui.InputFloat("z", ref pz);
-                if (ImGui.Button("Teleport"))
+                if (ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayerExist)
                 {
-                    ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position = new Vector3(px, py, pz);
-                    ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SendPos();
+
+                    ImGui.Text($"Player Position: {ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position}");
+                    if (ImGui.SliderFloat("FOV", ref Fov, 1, 110))
+                    {
+                        ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer._Camera.Fov = Fov;
+                    }
+                    ImGui.InputText("Selected Block", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SelectedBlock, 100);
+                    ImGui.Checkbox("Fly", ref ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Fly);
+                    ImGui.Checkbox("RenderViewRay", ref ShowViewRay);
+                    ImGui.InputFloat("x", ref px);
+                    ImGui.InputFloat("y", ref py);
+                    ImGui.InputFloat("z", ref pz);
+                    if (ImGui.Button("Teleport"))
+                    {
+                        ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.Position = new Vector3(px, py, pz);
+                        ClientWorldManager.world.GetPlayerFactoryClient().LocalPlayer.SendPos();
+                    }
+                    ImGui.SeparatorText("Player Factory");
+                    ImGui.Text("Player count :" + ClientWorldManager.world.GetPlayerFactoryClient().PlayerList.Count.ToString());
                 }
             }
-            ImGui.SeparatorText("Player Factory");
-            ImGui.Text("Player count :" + ClientWorldManager.world.GetPlayerFactoryClient().PlayerList.Count.ToString());
             ImGui.End();
         }
         /// <summary>
@@ -191,6 +212,7 @@ namespace VoxPopuliLibrary.Engine.Debug
             {
                 NetMenu = false;
             }
+            ImGui.InputText("PlayerName", ref Account.Name, 100);
             ImGui.InputText("Ip", ref ip, 100);
             ImGui.InputInt("Port", ref port);
             if (ImGui.Button("Connect"))
@@ -217,9 +239,12 @@ namespace VoxPopuliLibrary.Engine.Debug
             ImGui.Separator();
             ImGui.Text("Chunks graphics informations");
             ImGui.Text("Chunks which have mesh update");
-            ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkMeshUpdated.ToString());
-            ImGui.Text("Chunks rendered");
-            ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkRendered.ToString());
+            if (ClientWorldManager.Initialized)
+            {
+                ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkMeshUpdated.ToString());
+                ImGui.Text("Chunks rendered");
+                ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkRendered.ToString());
+            }
             if (ImGui.Button("Debug Mesh"))
             {
                 if (WireFrameView == true)
@@ -233,6 +258,7 @@ namespace VoxPopuliLibrary.Engine.Debug
                     GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
                 }
             }
+            ImGui.Checkbox("DebugText",ref DebugFont);
             ImGui.End();
         }
         /// <summary>
@@ -265,11 +291,15 @@ namespace VoxPopuliLibrary.Engine.Debug
             {
                 foreach (Chunk ch in ClientWorldManager.world.GetChunkManagerClient().Clist.Values)
                 {
-                    if (ch.Empty == false && ch.VerticeCount != 0)
+                    if (ch.VerticeCount != 0)
                     {
                         RenderSystem.RenderDebugBox(ChunkBox, new Vector3(ch.Position.X * 16, ch.Position.Y * 16, ch.Position.Z * 16));
                     }
                 }
+            }
+            if(DebugFont)
+            {
+                RessourceManager.RessourceManager.GetFont("Pixeloid").RenderText("This is sample text",new Vector3(1,0,0), 25.0f, 50.0f, 0.5f, new Vector2(1f, 0f));
             }
         }
         /// <summary>

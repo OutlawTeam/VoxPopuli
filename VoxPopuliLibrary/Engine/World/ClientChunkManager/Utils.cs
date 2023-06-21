@@ -2,11 +2,52 @@
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.Network;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VoxPopuliLibrary.Engine.World
 {
     internal partial class ClientChunkManager
     {
+        internal string GetBlockForMesh(Vector3i bpos , Vector3i cpos)
+        {
+            Vector3i Rpos = cpos;
+            if(bpos.X > 15)
+            {
+                Rpos.X += 1;
+                bpos.X = 0;
+            }else if(bpos.X <0)
+            { 
+                Rpos.X -= 1;
+                bpos.X = 15;
+            }
+            if (bpos.Y > 15)
+            {
+                Rpos.Y += 1;
+                bpos.Y= 0;
+            }
+            else if (bpos.Y < 0)
+            {
+                Rpos.Y -= 1;
+                bpos.Y = 15;
+            }
+            if (bpos.Z > 15)
+            {
+                Rpos.Z += 1;
+                bpos.Z = 0;
+            }
+            else if (bpos.Z < 0)
+            {
+                Rpos.Z -= 1;
+                bpos.Z = 15;
+            }
+            try
+            {
+                return GetChunk(Rpos.X,Rpos.Y,Rpos.Z).GetBlock(bpos.X,bpos.Y,bpos.Z);
+            }catch(Exception ex)
+            {
+                throw new Exception("The demanded chunk is not loaded"+ex);
+            }
+        }
         internal Chunk GetChunk(int x, int y, int z)
         {
             if (Clist.TryGetValue(new Vector3i(x, y, z), out Chunk ch))

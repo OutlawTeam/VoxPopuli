@@ -1,8 +1,9 @@
 ﻿using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
-    internal static partial class RessourceManager
+    public static partial class RessourceManager
     {
         const string BaseVoxelTextureFolder = "assets/textures/blocks";
         public static Texture GetAtlas()
@@ -22,9 +23,11 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
         }
         private static void LoadVoxelAtlas()
         {
-            string[] blockTextures = Directory.GetFiles(BaseVoxelTextureFolder, "*.png");
+            
             List<Image<Rgba32>> loadedTextures = new List<Image<Rgba32>>();
             List<string> textureNames = new List<string>();
+
+            string[] blockTextures = Directory.GetFiles(BaseVoxelTextureFolder, "*.png");
             foreach (string filePath in blockTextures)
             {
                 if (Path.GetFileNameWithoutExtension(filePath) != "atlas")
@@ -33,6 +36,20 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
                     var texture = Image.Load<Rgba32>(stream);
                     loadedTextures.Add(texture);
                     textureNames.Add(Path.GetFileNameWithoutExtension(filePath));
+                }
+            }
+            foreach (string mod in ModManager.ModAssetFolder)
+            {
+                string[] blocksTextures = Directory.GetFiles(mod+"/"+BaseVoxelTextureFolder, "*.png");
+                foreach (string filePath in blocksTextures)
+                {
+                    if (Path.GetFileNameWithoutExtension(filePath) != "atlas")
+                    {
+                        using var stream = File.OpenRead(filePath);
+                        var texture = Image.Load<Rgba32>(stream);
+                        loadedTextures.Add(texture);
+                        textureNames.Add(Path.GetFileNameWithoutExtension(filePath));
+                    }
                 }
             }
 
@@ -89,7 +106,7 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
             }
 
             // Sauvegarder l'image de l'atlas dans un fichier PNG
-            atlasImage.Save(BaseVoxelTextureFolder + "/atlas.png");
+            atlasImage.Save("debug/atlas.png");
             VoxelAtlas = Texture.LoadFromData(atlasImage);
         }
     }

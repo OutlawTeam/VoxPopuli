@@ -18,6 +18,7 @@ namespace VoxPopuliLibrary.Engine.Player
         public Vector3 CRight;
         public float Elevation;
         public bool Fly;
+        public float Dt;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -39,6 +40,7 @@ namespace VoxPopuliLibrary.Engine.Player
             CRight.Z = reader.GetFloat();
             Elevation = reader.GetFloat();
             Fly = reader.GetBool();
+            Dt = reader.GetFloat();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -61,6 +63,7 @@ namespace VoxPopuliLibrary.Engine.Player
             writer.Put(CRight.Z);
             writer.Put(Elevation);
             writer.Put(Fly);
+            writer.Put(Dt);
         }
     }
     #endregion
@@ -69,11 +72,13 @@ namespace VoxPopuliLibrary.Engine.Player
     internal struct PlayerData : INetSerializable
     {
         public ushort ClientID;
+        public string Name;
         public Vector3d Position;
         public Vector3 Rotation;
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(ClientID);
+            writer.Put(Name);
             writer.Put(Position.X);
             writer.Put(Position.Y);
             writer.Put(Position.Z);
@@ -84,6 +89,7 @@ namespace VoxPopuliLibrary.Engine.Player
         public void Deserialize(NetDataReader reader)
         {
             ClientID = reader.GetUShort();
+            Name = reader.GetString();
             Position.X = reader.GetDouble();
             Position.Y = reader.GetDouble();
             Position.Z = reader.GetDouble();

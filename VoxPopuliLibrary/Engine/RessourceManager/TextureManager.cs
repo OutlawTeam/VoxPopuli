@@ -1,8 +1,9 @@
 ﻿using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
-    internal static partial class RessourceManager
+    public static partial class RessourceManager
     {
         const string BaseTextureFolder = "assets/textures/other";
         private static void LoadTextures()
@@ -16,8 +17,26 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
                 }
                 catch
                 {
-                    throw new Exception("An error occur, the texture could not load !");
+                    throw new Exception("An error occur, the texture can't not load !");
                 }
+            }
+            foreach (string mod in ModManager.ModAssetFolder)
+            {
+                try
+                {
+                    string[] texturess = Directory.GetFiles(mod + "/" + BaseTextureFolder, "*.png");
+                    foreach (string filePath in texturess)
+                    {
+                        try
+                        {
+                            Textures.Add(Path.GetFileNameWithoutExtension(filePath), Texture.LoadFromFile(filePath));
+                        }
+                        catch
+                        {
+                            throw new Exception("An error occur, the texture can't not load !");
+                        }
+                    }
+                }catch {}
             }
         }
         public static Texture GetTexture(string Name)

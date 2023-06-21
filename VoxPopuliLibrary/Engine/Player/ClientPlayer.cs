@@ -7,6 +7,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using VoxPopuliLibrary.Engine.API;
 
 namespace VoxPopuliLibrary.Engine.Player
 {
@@ -34,10 +35,15 @@ namespace VoxPopuliLibrary.Engine.Player
         }
         internal void Render()
         {
+            if(LocalPlayerExist)
+            {
+                LocalPlayer.RenderSelectedBlock();
+            }
             foreach (var player in PlayerList.Values)
             {
                 if (player != LocalPlayer)
                 {
+                    //API.API.GetGraphicEngine().Render3DModel();
                     player.Render();
                 }
             }
@@ -59,6 +65,7 @@ namespace VoxPopuliLibrary.Engine.Player
                     player.Rotation = data.Rotation;
                 }
                 player.Position = data.Position;
+                player.Name = data.Name;
             }
         }
         internal void HandleDeco(PlayerDeco data, NetPeer peer)

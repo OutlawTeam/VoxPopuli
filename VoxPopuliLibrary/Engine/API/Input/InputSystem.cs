@@ -15,5 +15,23 @@ namespace VoxPopuliLibrary.Engine.API.Input
             Mouse = M;
             FrameEvent = F;
         }
+        internal static bool KeyPressed(Keys key)
+        {
+            if (Keyboard.IsKeyPressed(key)) { return true; } return false;
+        }
+        internal static bool MousePressed(MouseButton but)
+        {
+            if (Mouse.IsButtonPressed(but)) { return true; } return false;
+        }
+        internal static bool MouseDown(MouseButton but)
+        {
+            if (Mouse.IsButtonDown(but)) { return true; }
+            return false;
+        }
+        internal static bool KeyDown(Keys key)
+        {
+            if (Keyboard.IsKeyDown(key)) { return true; }
+            return false;
+        }
     }
 }

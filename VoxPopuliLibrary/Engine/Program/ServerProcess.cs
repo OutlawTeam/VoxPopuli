@@ -4,6 +4,7 @@
  * Author Florian Pfeiffer
  */
 using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
 
@@ -29,7 +30,7 @@ namespace VoxPopuliLibrary.Engine.Program
         /____/\_, /    \____/\_,_/\__/_/\_,_/|__,__/     /_/  \__/\_,_/_/_/_/
              /___/                                                           
         ";
-        public static void Main()
+        public static void Main(bool Standalone)
         {
             Console.SetWindowSize(100, 25);
             Console.WriteLine(Title);
@@ -45,17 +46,21 @@ namespace VoxPopuliLibrary.Engine.Program
                                                                   | |                          
                                                                   |_|              
             */
-            RessourceManager.ServerRessourceManager.LoadRessources();
-            Console.WriteLine("Ressources have been Initialize");
-            BlockManager.InitServer();
-            Console.WriteLine("Blocks have been Initialize");
+            if (Standalone)
+            {
+                ModManager.LoadMods();
+                Console.WriteLine("Mods have been Load");
+                ModManager.Init();
+                Console.WriteLine("Mods have been Initialize");
+                RessourceManager.RessourceManager.LoadRessourcesServer();
+                Console.WriteLine("Ressources have been Initialize");
+            }
             ServerWorldManager.InitWorld();
             Console.WriteLine("World have been Initialize");
             ServerNetwork.StartServer(23482);
             Console.WriteLine("Network have been Initialized");
 
             Console.WriteLine("The server has finished initializing, it is now ready at: " + ServerNetwork.server.LocalPort);
-            Console.WriteLine("Server game version: " + API.Version.GameVersion);
             Console.WriteLine("Server engine version: " + API.Version.EngineVersion);
             Console.WriteLine("Server api version: " + API.Version.APIVersion);
             while (true)

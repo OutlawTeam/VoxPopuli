@@ -2,20 +2,29 @@
 using LiteNetLib.Utils;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
 using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.Debug;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 using VoxPopuliLibrary.Engine.Network;
+using VoxPopuliLibrary.Engine.Physics;
 using VoxPopuliLibrary.Engine.World;
 
 namespace VoxPopuliLibrary.Engine.Player
 {
-    internal class Player : Entity
+    internal class Player : PhysicEntity
     {
         internal float sensitivity = 0.2f;
         internal float NormalSpeed = 5f;
         internal float SprintSpeed = 8f;
+        internal float EntityHeight = 1.80f;
+        internal float EntityWidth = 0.60f;
+        internal float EntityDepth = 0.60f;
+        internal float EntityEYEHeight = 1.70f;
         internal bool _firstMove = true;
+        internal string Name = "Test";
         internal Vector2 _lastPos;
         internal Camera _Camera;
         internal bool Local = false;
@@ -25,11 +34,14 @@ namespace VoxPopuliLibrary.Engine.Player
         internal Vector3 Front;
         internal Vector3 Right;
         internal float Elevation;
-        internal int SelectedBlock = 3;
+        internal string SelectedBlock = "VoxPopuli:dirt";
         internal int Reach = 3;
-        internal Vector3i BlockSePos;
-        internal bool BlockIsSec;
-
+        internal static DebugBox BlockBox = new DebugBox(new Vector3d(1.03125, 1.03125, 1.03125),new Vector4(0.33f,0.33f,0.33f,1));
+        internal static Vector3i ViewedBlockPos;
+        internal Maths.Ray ViewRay;
+        internal static bool ViewBlock = false;
+        const float BOUND = 89.0f;
+        internal MouseState m;
         public Player(Vector3d _Position, ushort _ClientID, bool Local, bool Client)
         {
             Position = _Position;
@@ -38,15 +50,62 @@ namespace VoxPopuliLibrary.Engine.Player
                 if (Local)
                 {
                     _Camera = new Camera((Vector3)_Position, 16 / 9);
+                    ViewRay = new Maths.Ray(Vector3d.Zero, Vector3.Zero, Reach);
                 }
+
+                //_Model = RessourceManager.RessourceManager.GetModel("Player");
                 _Model = RessourceManager.RessourceManager.GetModel("Player");
             }
             ClientID = _ClientID;
         }
+        internal void HitCallBack(Vector3i CurrentBlock ,Vector3i NextBlock)
+        {
+            ViewBlock = true;
+            ViewedBlockPos = NextBlock;
+            if(m.IsButtonPressed(MouseButton.Left))
+            {
+                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(NextBlock,"air");
+            }else if(m.IsButtonPressed(MouseButton.Right))
+            {
+                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(CurrentBlock, SelectedBlock);
+            }
+            else if (m.IsButtonPressed(MouseButton.Middle))
+            {
+                if(ClientWorldManager.world.GetBlock(NextBlock.X,NextBlock.Y,NextBlock.Z,out string id))
+                {
+                    SelectedBlock = id;
+                }
+            }
+        }
+        internal void HitCallBackTest(Vector3i CurrentBlock, Vector3i Normal,string BlockID)
+        {
+            ViewBlock = true;
+            ViewedBlockPos = CurrentBlock;
+            Vector3i BlockBefore = new Vector3i(CurrentBlock.X+Normal.X,CurrentBlock.Y+Normal.Y,CurrentBlock.Z+Normal.Z);
+            if (m.IsButtonPressed(MouseButton.Left))
+            {
+                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(CurrentBlock, "air");
+            }
+            else if (m.IsButtonPressed(MouseButton.Right))
+            {
+                ClientWorldManager.world.GetChunkManagerClient().ChangeChunk(BlockBefore, SelectedBlock);
+            }
+            else if (m.IsButtonPressed(MouseButton.Middle))
+            {
+                if (ClientWorldManager.world.GetBlock(CurrentBlock.X, CurrentBlock.Y, CurrentBlock.Z, out string id))
+                {
+                    SelectedBlock = id;
+                }
+            }
+        }
         //Client
         internal void UpdateClient(float DT, KeyboardState Keyboard, MouseState Mouse, bool Grabed)
         {
+            ViewBlock = false;
+            m = Mouse;
             base.UpdateClient(DT);
+            ViewRay.Update(new Vector3d(Position.X, Position.Y + EntityEYEHeight, Position.Z),_Camera.Front,Reach);
+            ViewRay.TestWithTerrain(HitCallBackTest);
             float Speed = NormalSpeed;
             if (Keyboard.IsKeyDown(Keys.LeftControl))
             {
@@ -136,27 +195,32 @@ namespace VoxPopuliLibrary.Engine.Player
                 }
                 else
                 {
-                    // Calculate the offset of the mouse position
-                    var deltaX = Mouse.X - _lastPos.X;
-                    var deltaY = Mouse.Y - _lastPos.Y;
+                    var change = Mouse.Position - _lastPos;
+                    Rotation.X -= change.Y * sensitivity;
+                    Rotation.Y += change.X * sensitivity;
 
-
+                    if (Rotation.X > BOUND)
+                        Rotation.X = BOUND;
+                    else if (Rotation.X < -BOUND)
+                        Rotation.X = -BOUND;
+                    if (Rotation.Y > 360)
+                        Rotation.Y = 0;
+                    else if (Rotation.Y < 0)
+                        Rotation.Y = 360;
+                    _Camera.Yaw = Rotation.Y;
+                    _Camera.Pitch = Rotation.X;
                     _lastPos = new Vector2(Mouse.X, Mouse.Y);
-                    // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
-                    _Camera.Yaw += deltaX * sensitivity;
-                    _Camera.Pitch -= deltaY * sensitivity; // Reversed since y-coordinates range from bottom to top
-                    Rotation.X = _Camera.Yaw;
-                    Rotation.Y = _Camera.Pitch;
                 }
             }
             Elevation = (float)Math.Abs(Math.Acos(_Camera.Front.Y));
             Front = new Vector3(_Camera.Front.X, 0, _Camera.Front.Z).Normalized();
             Right = new Vector3(_Camera.Right.X, 0, _Camera.Right.Z);
-            SendControl();
+            SendControl(DT);
             CollisionTerrain(DT);
             _Camera.Position = new Vector3((float)Position.X, (float)Position.Y + EntityEYEHeight, (float)Position.Z);
+
         }
-        internal void SendControl()
+        internal void SendControl(float dt)
         {
             PlayerControl message = new PlayerControl
             {
@@ -171,7 +235,8 @@ namespace VoxPopuliLibrary.Engine.Player
                 Front = Front,
                 CRight = _Camera.Right,
                 Elevation = Elevation,
-                Fly = Fly
+                Fly = Fly,
+                Dt = dt
             }; 
             ClientNetwork.SendPacket(message, DeliveryMethod.ReliableUnordered);
             
@@ -180,6 +245,14 @@ namespace VoxPopuliLibrary.Engine.Player
         {
             PlayerPositionTP packet = new PlayerPositionTP {Position =Position };
             ClientNetwork.SendPacket(packet,DeliveryMethod.ReliableOrdered);
+        }
+        internal void RenderSelectedBlock()
+        {
+            if (ViewBlock)
+            {
+                RenderSystem.RenderDebugBox(BlockBox, ViewedBlockPos-new Vector3(0.015625f));
+            }
+            Renderer.RenderImage("cross",API.API.WindowWidth()/2-16,API.API.WindowHeight()/2-16,32,32);
         }
         internal void Render()
         {
@@ -192,6 +265,8 @@ namespace VoxPopuliLibrary.Engine.Player
             RessourceManager.RessourceManager.GetShader("Entity").SetMatrix4("projection", ClientWorldManager.world.LocalPlayerCamera().GetProjectionMatrix());
             GL.DrawArrays(PrimitiveType.Triangles, 0, _Model._Vertices.Count());
             GL.BindVertexArray(0);
+            RessourceManager.RessourceManager.GetFont("FreeSans").Render3DText(Name, new Vector3(0.85f, 0.78f, 0.09f),
+                new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight + 0.40), (float)Position.Z),0.0075f,new Vector3(180, Rotation.Y-90, 0));
         }
         //Server
         internal override void UpdateServer(float DT)
@@ -250,7 +325,7 @@ namespace VoxPopuliLibrary.Engine.Player
         }
         internal void SendData()
         {
-            PlayerData packet = new PlayerData { ClientID = ClientID,Position = Position,Rotation = Rotation};
+            PlayerData packet = new PlayerData { ClientID = ClientID,Position = Position,Rotation = Rotation,Name = Name};
             ServerNetwork.SendPacketToAll(packet,DeliveryMethod.Unreliable);
         }
     }

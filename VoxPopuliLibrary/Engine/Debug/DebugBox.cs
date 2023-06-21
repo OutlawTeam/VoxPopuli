@@ -11,7 +11,7 @@ namespace VoxPopuliLibrary.Engine.Debug
         public DebugBox(Vector3d BoxSize, Vector4 color)
         {
             Color = color;
-            float xmax = (float)BoxSize.Z;
+            float xmax = (float)BoxSize.X;
             float ymax = (float)BoxSize.Y;
             float zmax = (float)BoxSize.Z;
             float x = 0;

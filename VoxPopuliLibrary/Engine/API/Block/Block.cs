@@ -4,23 +4,52 @@
  * Author Florian Pfeiffer
  */
 
-using VoxPopuliLibrary.Engine.GraphicEngine;
-using VoxPopuliLibrary.Engine.Physics;
+using OpenTK.Mathematics;
 
 namespace VoxPopuliLibrary.Engine.API
 {
-    internal class Block
+    public class Block
     {
-        internal float[] texture0;
-        internal float[] texture1;
-        internal float[] texture2;
-        internal float[] texture3;
-        internal float[] texture4;
-        internal float[] texture5;
-        internal bool IsTransparent;
-        internal bool IsSolid = true;
-        internal bool Cube = true;
-        internal BlockMesh Mesh;
-        internal Collider[] Colliders;
+
+        private bool Transparency = false;
+        private float Friction = 20;
+        string Mesh = "Cube";
+        string Collider = "Cube";
+        BlockTexture Texture;
+        BlockRenderType RenderType = BlockRenderType.Block;
+        public Block(BlockBuilder builder)
+        {
+            Transparency = builder.Transparency; 
+            Friction = builder.Friction;
+            Mesh = builder.Mesh;
+            Collider = builder.Collider;
+            Texture = builder.Texture;
+            RenderType = builder.RenderType;
+        }
+        public bool GetTransparency()
+        {
+            return Transparency;
+        }
+        public Vector3 GetFriction()
+        {
+            return new Vector3(Friction);
+        }
+        public string GetMesh()
+        {
+            return Mesh;
+        }
+        public string GetCollider()
+        {
+            return Collider;
+        }
+        public BlockTexture GetTexture()
+        {
+            return Texture;
+        }
+        public BlockRenderType GetRenderType()
+        {
+            return RenderType;
+        }
     }
+    
 }

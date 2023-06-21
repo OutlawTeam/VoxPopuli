@@ -8,7 +8,7 @@ using StbImageSharp;
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
     // A helper class, much like Shader, meant to simplify loading textures.
-    internal class Texture
+    public class Texture
     {
         internal readonly int Handle;
 

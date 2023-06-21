@@ -3,4 +3,4 @@
 * Copyrights Florian Pfeiffer
 * Author Florian Pfeiffer
 */
-VoxPopuliLibrary.Engine.Program.Program.Main();
+VoxPopuliLibrary.Engine.Program.Program.Main(true);

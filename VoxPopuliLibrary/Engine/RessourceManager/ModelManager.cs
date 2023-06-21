@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
-    internal static partial class RessourceManager
+    public static partial class RessourceManager
     {
         const string BaseModelFolder = "assets/models/entities";
         public static Model GetModel(string Name)
@@ -26,12 +27,34 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
                 {
                     string json = File.ReadAllText(filePath);
                     var data = JsonConvert.DeserializeObject<ModelData>(json);
-                    Models.Add(data.Name, new Model(data.Model));
+
+                    Models.Add(data.Name,new Model(data.Model));
                 }
                 catch (Exception ex)
                 {
                     throw new Exception("Model can't be loaded due to :" + ex);
                 }
+            }
+            foreach (string mod in ModManager.ModAssetFolder)
+            {
+                try
+                {
+                    string[] JsonsModel = Directory.GetFiles(mod + "/" + BaseModelFolder, "*.json");
+                    foreach (string filePath in JsonsModel)
+                    {
+                        try
+                        {
+                            string json = File.ReadAllText(filePath);
+                            var data = JsonConvert.DeserializeObject<ModelData>(json);
+                            Models.Add(data.Name, new Model(data.Model));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Model can't be loaded due to :" + ex);
+                        }
+                    }
+                }
+                catch { }
             }
         }
     }

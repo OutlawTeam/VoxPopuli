@@ -20,9 +20,9 @@ namespace VoxPopuliLibrary.Engine.World
             BinaryFormatter formatter = new BinaryFormatter();
             using (MemoryStream stream = new MemoryStream())
             {
-                #pragma warning disable SYSLIB0011 // Le type ou le membre est obsolète
+#pragma warning disable SYSLIB0011 // Le type ou le membre est obsolète
                 formatter.Serialize(stream, data);
-                #pragma warning restore SYSLIB0011 // Le type ou le membre est obsolète
+#pragma warning restore SYSLIB0011 // Le type ou le membre est obsolète
                 serializedBytes = stream.ToArray();
             }
             writer.Put(serializedBytes);
@@ -35,12 +35,12 @@ namespace VoxPopuliLibrary.Engine.World
             BinaryFormatter formatter = new BinaryFormatter();
             using (MemoryStream stream = new MemoryStream(reader.GetRemainingBytes()))
             {
-                #pragma warning disable SYSLIB0011 // Le type ou le membre est obsolète
-                                data = (ChunkData)formatter.Deserialize(stream);
-                #pragma warning restore SYSLIB0011 // Le type ou le membre est obsolète
-                                // Utilisez la structure désérialisée selon vos besoins
+#pragma warning disable SYSLIB0011 // Le type ou le membre est obsolète
+                data = (ChunkData)formatter.Deserialize(stream);
+#pragma warning restore SYSLIB0011 // Le type ou le membre est obsolète
+                // Utilisez la structure désérialisée selon vos besoins
             }
-            
+
         }
 
     }

@@ -35,8 +35,27 @@ namespace VoxPopuliLibrary.Engine.World
                 Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y - 1, chunk.Position.Z)) &&
                 Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y, chunk.Position.Z - 1)) &&
                 Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y + 1, chunk.Position.Z)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y + 1, chunk.Position.Z)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y - 1, chunk.Position.Z)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y - 1, chunk.Position.Z)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y + 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y - 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y + 1, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X, chunk.Position.Y - 1, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y + 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y + 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y - 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y - 1, chunk.Position.Z + 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y + 1, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y + 1, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X + 1, chunk.Position.Y - 1, chunk.Position.Z - 1)) &&
+                Clist.ContainsKey(new Vector3i(chunk.Position.X - 1, chunk.Position.Y - 1, chunk.Position.Z - 1)) &&
                 chunk.Empty == false)
-
                 {
                     chunk.GenerateMesh();
                     ChunkMesh.RemoveAt(i);

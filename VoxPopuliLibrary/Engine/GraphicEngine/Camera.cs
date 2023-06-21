@@ -13,7 +13,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         private Vector3 _right = Vector3.UnitX;
         private float _pitch;
         private float _yaw = -MathHelper.PiOver2;
-        internal float _fov = MathHelper.PiOver2;
+        internal float _fov = MathHelper.DegreesToRadians(70);
         internal Vector3 Direction { get { return new Vector3(-GetViewMatrix().M13, -GetViewMatrix().M23, -GetViewMatrix().M33); } }
         internal Camera(Vector3 position, float aspectRatio)
         {
@@ -49,7 +49,7 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             get => MathHelper.RadiansToDegrees(_fov);
             set
             {
-                var angle = MathHelper.Clamp(value, 1f, 90f);
+                var angle = MathHelper.Clamp(value, 1f, 110f);
                 _fov = MathHelper.DegreesToRadians(angle);
             }
         }

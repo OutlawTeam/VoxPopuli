@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
+using VoxPopuliLibrary.Engine.API;
 using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
-    internal static partial class RessourceManager
+    public static partial class RessourceManager
     {
         const string BaseBlockModelFolder = "assets/models/blocks";
 
@@ -34,6 +36,29 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
                     throw new Exception("Model can't be loaded due to :" + ex);
                 }
             }
+            foreach (string mod in ModManager.ModAssetFolder)
+            {
+                try
+                {
+                    string[] JsonsModel = Directory.GetFiles(mod + "/" + BaseBlockModelFolder, "*.json");
+                    foreach (string filePath in JsonsModel)
+                    {
+                        try
+                        {
+                            string json = File.ReadAllText(filePath);
+                            var data = JsonConvert.DeserializeObject<BlockModelData>(json);
+                            BlockMeshs.Add(data.Name, new BlockMesh(data.Model));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Model can't be loaded due to :" + ex);
+                        }
+                    }
+                }
+                catch { }
+
+            }
+        
         }
     }
     class BlockModelData

@@ -1,6 +1,6 @@
 ﻿namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
-    internal class BlockMesh
+    public class BlockMesh
     {
         private float[][] Mesh;
         internal BlockMesh(float[][] Model)

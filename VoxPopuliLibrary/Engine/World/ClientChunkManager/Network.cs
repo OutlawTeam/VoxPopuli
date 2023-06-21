@@ -16,7 +16,7 @@ namespace VoxPopuliLibrary.Engine.World
             Vector3i pos = new Vector3i(data.x, data.y, data.z);
             if (!Clist.TryGetValue(pos, out Chunk _))
             {
-                Clist.Add(pos,new Chunk(data.data.data,data.data.pal,pos));
+                Clist.Add(pos, new Chunk(data.data.data, data.data.pal, pos));
                 if (Clist[pos].Empty == false)
                 {
                     ChunkMesh.Add(Clist[pos]);
@@ -25,16 +25,14 @@ namespace VoxPopuliLibrary.Engine.World
         }
         internal void HandleChunkUnload(UnloadChunk data, NetPeer peer)
         {
-            Console.WriteLine("test");
             Vector3i pos = new Vector3i(data.x, data.y, data.z);
             if (Clist.TryGetValue(pos, out Chunk _))
             {
                 Clist.Remove(pos);
             }
         }
-        internal void HandleChunkUpdate(OneBlockChange data,NetPeer peer)
+        internal void HandleChunkUpdate(OneBlockChange data, NetPeer peer)
         {
-            Console.WriteLine("ChunkModification");
             Vector3i cpos = new Vector3i(data.cx, data.cy, data.cz);
             Vector3i bpos = new Vector3i(data.bx, data.by, data.bz);
             if (Clist.TryGetValue(cpos, out Chunk ch))
@@ -64,7 +62,7 @@ namespace VoxPopuliLibrary.Engine.World
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X + 1, cpos.Y, cpos.Z), out Chunk ch1))
             {
-                if(ch1.Empty == false)
+                if (ch1.Empty == false)
                 {
                     ch1.Changed = true;
                     ChunkMesh.Add(ch1);
@@ -72,7 +70,7 @@ namespace VoxPopuliLibrary.Engine.World
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X - 1, cpos.Y, cpos.Z), out Chunk ch2))
             {
-                if(ch2.Empty == false)
+                if (ch2.Empty == false)
                 {
                     ch2.Changed = true;
                     ChunkMesh.Add(ch2);

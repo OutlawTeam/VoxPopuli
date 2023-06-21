@@ -3,10 +3,12 @@
 namespace VoxPopuliLibrary.Engine.Physics
 {
     [Serializable]
-    internal class Collider
+    public class Collider
     {
         public double x1, y1, z1;
         public double x2, y2, z2;
+        public Vector3d min { get { return new Vector3d(x1, y1, z1); } }
+        public Vector3d max { get { return new Vector3d(x2, y2, z2); } }
         public Collider(Vector3d pos1 = default, Vector3d pos2 = default)
         {
             x1 = pos1.X;
@@ -36,7 +38,7 @@ namespace VoxPopuliLibrary.Engine.Physics
             }
         }
 
-        public (double?, Vector3) Collide(Collider collider, Vector3 velocity)
+        public (double?, Vector3d) Collide(Collider collider, Vector3 velocity)
         {
             double vx = velocity.X, vy = velocity.Y, vz = velocity.Z;
             double x_entry = Time(vx > 0 ? collider.x1 - x2 : collider.x2 - x1, vx);
@@ -50,38 +52,36 @@ namespace VoxPopuliLibrary.Engine.Physics
 
             if (x_entry < 0 && y_entry < 0 && z_entry < 0)
             {
-                return (null, Vector3.Zero);
+                return (null, Vector3d.Zero);
             }
 
             if (x_entry > 1 || y_entry > 1 || z_entry > 1)
             {
-                return (null, Vector3.Zero);
+                return (null, Vector3d.Zero);
             }
 
             double entry = Math.Max(Math.Max(x_entry, y_entry), z_entry);
             double exit_ = Math.Min(Math.Min(x_exit, y_exit), z_exit);
-            //Console.WriteLine(entry + " " + exit_);
             if (entry > exit_)
             {
-                return (null, Vector3.Zero);
+                return (null, Vector3d.Zero);
             }
-            Vector3 normal = Vector3.Zero;
+            Vector3d normal = Vector3d.Zero;
             if (entry == x_entry)
             {
-                normal = new Vector3(vx > 0 ? -1 : 1, 0, 0);
+                normal = new Vector3d(vx > 0 ? -1 : 1, 0, 0);
             }
             else if (entry == y_entry)
             {
-                normal = new Vector3(0, vy > 0 ? -1 : 1, 0);
+                normal = new Vector3d(0, vy > 0 ? -1 : 1, 0);
             }
             else if (entry == z_entry)
             {
-                normal = new Vector3(0, 0, vz > 0 ? -1 : 1);
+                normal = new Vector3d(0, 0, vz > 0 ? -1 : 1);
             }
             return (entry, normal);
         }
-
-        public Collider Move(Vector3 pos)
+        public Collider Move(Vector3d pos)
         {
             double x = pos.X;
             double y = pos.Y;

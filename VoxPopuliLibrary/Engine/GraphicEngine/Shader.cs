@@ -8,7 +8,7 @@ using OpenTK.Mathematics;
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
     // A simple class meant to help create shaders.
-    internal class Shader
+    public class Shader
     {
         internal readonly int Handle;
 
@@ -173,6 +173,11 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         {
             GL.UseProgram(Handle);
             GL.UniformMatrix4(_uniformLocations[name], true, ref data);
+        }
+        internal void SetMatrix4NoTranspose(string name, Matrix4 data)
+        {
+            GL.UseProgram(Handle);
+            GL.UniformMatrix4(_uniformLocations[name], false, ref data);
         }
 
         /// <summary>

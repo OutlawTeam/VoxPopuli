@@ -17,9 +17,9 @@ namespace VoxPopuliLibrary.Engine.World
         internal Queue<ServerChunkData> ChunkToBeSend = new Queue<ServerChunkData>();
         internal void Update()
         {
-            for(int x= 0;x <=10;x++)
+            for (int x = 0; x <= 10; x++)
             {
-                if(ChunkToBeSend.TryDequeue(out ServerChunkData packet))
+                if (ChunkToBeSend.TryDequeue(out ServerChunkData packet))
                 {
                     ServerNetwork.SendPacket(packet, packet.peer, DeliveryMethod.ReliableOrdered);
                 }
@@ -54,7 +54,7 @@ namespace VoxPopuliLibrary.Engine.World
                             }
                             else
                             {
-                                if(!Nothing.PlayerInChunk.Contains(player))
+                                if (!Nothing.PlayerInChunk.Contains(player))
                                 {
                                     Nothing.Used = true;
                                     Nothing.PlayerInChunk.Add(player);
@@ -76,10 +76,10 @@ namespace VoxPopuliLibrary.Engine.World
                 }
             }
             Vector3i[] keys = clist.Keys.ToArray();
-            foreach(Vector3i key in keys)
+            foreach (Vector3i key in keys)
             {
                 Chunk ch = clist[key];
-                for(int i = 0; i<ch.PlayerInChunk.Count; i++)
+                for (int i = 0; i < ch.PlayerInChunk.Count; i++)
                 {
                     Player.Player play = ch.PlayerInChunk[i];
                     int minx = (int)(play.Position.X / 16) - ServerWorldManager.world.LoadDistance;
@@ -89,7 +89,7 @@ namespace VoxPopuliLibrary.Engine.World
                     int maxy = (int)(play.Position.Y / 16) + ServerWorldManager.world.VerticalLoadDistance;
                     int maxz = (int)(play.Position.Z / 16) + ServerWorldManager.world.LoadDistance;
                     if (!(ch.Position.X >= minx && ch.Position.Y >= miny && ch.Position.Z >= minz
-                        && ch.Position.X <= maxx && ch.Position.Y <= maxy && ch.Position.X <= maxz) 
+                        && ch.Position.X <= maxx && ch.Position.Y <= maxy && ch.Position.Z <= maxz)
                         && ch.PlayerInChunk.Contains(play))
                     {
                         UnloadChunk packet = new UnloadChunk { x = key.X, y = key.Y, z = key.Z };
@@ -98,9 +98,9 @@ namespace VoxPopuliLibrary.Engine.World
                             DeliveryMethod.ReliableOrdered);
                     }
                 }
-                if (!ch.Used ||ch.PlayerInChunk.Count ==0)
+                if (!ch.Used || ch.PlayerInChunk.Count == 0)
                 {
-                    
+
                     clist.Remove(key);
                 }
                 ch.Used = false;
@@ -122,7 +122,7 @@ namespace VoxPopuliLibrary.Engine.World
         }
         internal void HandleBlockChange(OneBlockChangeDemand data, NetPeer peer)
         {
-            
+
             if (clist.TryGetValue(new Vector3i(data.cx, data.cy, data.cz), out Chunk tempChunk))
             {
                 tempChunk.SetBlock(data.bx, data.by, data.bz, data.BlockID);
@@ -136,7 +136,11 @@ namespace VoxPopuliLibrary.Engine.World
                     bz = data.bz,
                     BlockID = data.BlockID
                 };
-                ServerNetwork.SendPacket(packet,peer, DeliveryMethod.ReliableOrdered);
+                foreach(Player.Player play in tempChunk.PlayerInChunk)
+                {
+                    ServerNetwork.SendPacket(packet, ServerNetwork.server.GetPeerById( play.ClientID), DeliveryMethod.ReliableOrdered);
+                }
+                
             }
             else
             {

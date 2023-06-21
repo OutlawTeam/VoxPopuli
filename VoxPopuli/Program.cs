@@ -7,7 +7,6 @@
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.Program;
 
 namespace Vox_Populi

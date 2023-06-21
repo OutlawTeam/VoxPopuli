@@ -3,7 +3,7 @@ using StbImageSharp;
 
 namespace VoxPopuliLibrary.Engine.GraphicEngine
 {
-    internal class CubeMapTexture
+    public class CubeMapTexture
     {
         public readonly int Handle;
         public static CubeMapTexture LoadCubeMap(List<string> faces)

@@ -33,14 +33,14 @@ namespace VoxPopuliLibrary.Engine.World
             PlayerInChunk = new List<Player.Player>();
             Position = Pos;
             ChunkPalette = new Palette();
-            GenerateChunk();
+            ServerWorldManager.world.WorldGen.GenerateChunk(this);
         }
         /// <summary>
         /// Create chunk with receved chunk data for client
         /// </summary>
         /// <param name="blocks">Blocks data</param>
         /// <param name="Pos">Position</param>
-        internal Chunk(byte[] blocks,Palette chunkp, Vector3i Pos)
+        internal Chunk(byte[] blocks, Palette chunkp, Vector3i Pos)
         {
             ChunkPalette = chunkp;
             Position = Pos;

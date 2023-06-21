@@ -16,11 +16,13 @@ namespace VoxPopuliLibrary.Engine.Network
         internal static void StartServer(int Port)
         {
             EventBasedNetListener listener = new EventBasedNetListener();
-            server = new NetManager(listener) {AutoRecycle = true,DisconnectTimeout = 10000};
+            server = new NetManager(listener) {DisconnectTimeout = 10000};
             //
             //API
             //
-            PacketProcessor.RegisterNestedType<InitialPacket>();
+            PacketProcessor.RegisterNestedType<ServerInitialPacket>();
+            PacketProcessor.RegisterNestedType<ClientInitialPacket>();
+            PacketProcessor.SubscribeNetSerializable<ClientInitialPacket,NetPeer>(ClientInitialPacket);
             //
             //ChunkManager
             //
@@ -39,7 +41,7 @@ namespace VoxPopuliLibrary.Engine.Network
             PacketProcessor.SubscribeNetSerializable<PlayerControl, NetPeer>(ServerWorldManager.world.GetPlayerFactoryServer().HandleControl);
             PacketProcessor.SubscribeNetSerializable<PlayerPositionTP, NetPeer>(ServerWorldManager.world.GetPlayerFactoryServer().HandlePos);
 
-            listener.ConnectionRequestEvent += request =>
+            listener.ConnectionRequestEvent += request=>
             {
                 request.Accept();
             };
@@ -47,16 +49,17 @@ namespace VoxPopuliLibrary.Engine.Network
             {
                 Console.WriteLine("A player was connectected: {0}", peer.EndPoint); // Show peer ip
                 ServerWorldManager.world.GetPlayerFactoryServer().AddPlayer((ushort)peer.Id, peer);       // Send with reliability
-                InitialPacket packet = new InitialPacket
+                ServerInitialPacket packet = new ServerInitialPacket
                 {
                     EngineVersion = API.Version.EngineVersion,
-                    GameVersion = API.Version.GameVersion
+                    APIVersion = API.Version.APIVersion
                 };
                 SendPacket(packet, peer, DeliveryMethod.ReliableOrdered);
             };
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, Nothing) =>
             {
                 PacketProcessor.ReadAllPackets(dataReader,fromPeer);
+                dataReader.Recycle();
             };
             listener.PeerDisconnectedEvent += (peer, disconnectInfo) =>
             {
@@ -105,6 +108,13 @@ namespace VoxPopuliLibrary.Engine.Network
             message.Reset();
             PacketProcessor.WriteNetSerializable(message, ref packet);
             server.SendToAll(message, deliveryMethod,peer);
+        }
+        internal static void ClientInitialPacket(ClientInitialPacket data, NetPeer peer)
+        {
+            if(ServerWorldManager.world.GetPlayerFactoryServer().List.TryGetValue((ushort)peer.Id,out Player.Player play))
+            {
+                play.Name = data.Name;
+            }
         }
         internal static void Update()
         {

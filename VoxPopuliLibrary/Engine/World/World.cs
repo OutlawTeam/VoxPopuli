@@ -9,7 +9,10 @@ namespace VoxPopuliLibrary.Engine.World
 {
     internal class World
     {
+        public int Seed;
+        public WorldGenerator WorldGen;
         public int CHUNK_SIZE { get { return 16; } }
+        public int Height;
 
         internal int VerticalRenderDistance = 5;
         internal int RenderDistance = 7;
@@ -37,6 +40,9 @@ namespace VoxPopuliLibrary.Engine.World
             }
             else
             {
+                Height = 512;
+                Seed = new Random().Next(int.MinValue, int.MaxValue);
+                WorldGen = new WorldGenerator(Seed);
                 ChunkManagerServer = new ServerChunkManager();
                 PlayerFactoryServer = new Player.ServerPlayerFactory();
             }
@@ -65,21 +71,13 @@ namespace VoxPopuliLibrary.Engine.World
             }
             else
             {
-                PlayerFactoryServer.Update(dt);
-
+                frameWatch.Restart();
                 ChunkManagerServer.Update();
-
-                if (LowUpdate.ElapsedMilliseconds > 16)
+                if (LowUpdate.ElapsedMilliseconds > 25)
                 {
                     PlayerFactoryServer.SendData();
                     LowUpdate.Restart();
                 }
-                while (frameWatch.Elapsed.TotalSeconds < 0.016)
-                {
-                    Thread.Sleep(1);
-                }
-                dt = (float)frameWatch.Elapsed.TotalSeconds;
-                frameWatch.Restart();
             }
         }
         internal void Render()

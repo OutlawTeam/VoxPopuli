@@ -8,6 +8,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using VoxPopuliLibrary.Engine.Debug;
+using VoxPopuliLibrary.Engine.Physics;
 using VoxPopuliLibrary.Engine.World;
 
 namespace VoxPopuliLibrary.Engine.GraphicEngine
@@ -22,6 +23,9 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             window.CursorState = CursorState.Grabbed;
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Blend);
+            //GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.BlendFunc(0, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.Enable(EnableCap.Multisample);
             // Configurer le framebuffer avec 4 samples
             int colorBuffer;

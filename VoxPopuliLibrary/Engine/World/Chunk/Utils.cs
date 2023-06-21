@@ -1,4 +1,4 @@
-﻿using VoxPopuliLibrary.Engine.API;
+﻿using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.Maths;
 
 namespace VoxPopuliLibrary.Engine.World
@@ -11,7 +11,7 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 byte id = Blocks[Carray.TreetoOne(x, y, z)];
                 return ChunkPalette.GetBlock(id);
-                    
+
             }
             catch
             {
@@ -21,14 +21,15 @@ namespace VoxPopuliLibrary.Engine.World
         }
         internal void SetBlock(int x, int y, int z, string id)
         {
-            if(ChunkPalette.ContainBlock(id))
+            if (ChunkPalette.ContainBlock(id))
             {
                 Blocks[Carray.TreetoOne(x, y, z)] = ChunkPalette.GetBlockId(id);
             }
             else
             {
-                Blocks[Carray.TreetoOne(x, y, z)]= ChunkPalette.AddBlock(id);
+                Blocks[Carray.TreetoOne(x, y, z)] = ChunkPalette.AddBlock(id);
             }
         }
     }
 }
+

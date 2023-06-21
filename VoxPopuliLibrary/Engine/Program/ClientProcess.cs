@@ -3,15 +3,19 @@
  * Copyrights Florian Pfeiffer
  * Author Florian Pfeiffer
  **/
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
 using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.API.GUI;
 using VoxPopuliLibrary.Engine.API.Input;
 using VoxPopuliLibrary.Engine.Debug;
 using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.Init;
+using VoxPopuliLibrary.Engine.ModdingSystem;
 using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
 
@@ -36,12 +40,16 @@ namespace VoxPopuliLibrary.Engine.Program
         protected override void OnLoad()
         {
             base.OnLoad();
-            RessourceManager.RessourceManager.LoadRessources();
+            ModManager.LoadMods();
+            ModManager.Init();
+            RessourceManager.RessourceManager.LoadRessourcesClient();
             DebugSystem.Init(ClientSize);
             RenderSystem.Init(this);
+            Engine.API.API.Init(this);
+            MenuGUiManager.UpdateScale( Size.X , Size.Y);
+            ClientInit.Init();
             ClientNetwork.Init();
             ClientNetwork.Update();
-            BlockManager.InitClient();
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -54,6 +62,9 @@ namespace VoxPopuliLibrary.Engine.Program
             {
                 ClientWorldManager.RenderWorld();
             }
+
+            
+
             //
             //Debug
             DebugSystem.Update(this, (float)e.Time);
@@ -61,9 +72,27 @@ namespace VoxPopuliLibrary.Engine.Program
             {
                 DebugSystem.DebugMenu();
             }
+            /*
+            Panel pan = new Panel(new OpenTK.Mathematics.Vector2i(0,0),
+                new OpenTK.Mathematics.Vector2i(400,1080),
+                new OpenTK.Mathematics.Vector4(0.117f, 0.117f, 0.117f,0.5f));
+            Renderer.RenderImage("MainMenuBackGround", 0, 0, Size.X, Size.Y);
+            pan.Render();*/
+            /*
+             * 
+            Renderer.RenderRec(400,400,200,200,new OpenTK.Mathematics.Vector4(1,0,0,1));
+            Renderer.RenderImage("MainMenuBackGround", 650, 400, 100, 100);
+            Renderer.RenderText("Test", "FreeSans", 400, 400,48, new OpenTK.Mathematics.Vector4(0.117f, 0.117f, 0.177f, 1));*/
+            /*
+            var GUi = new GUI();
+            ImGui.NewFrame();
+            GUi.Render();
+            ImGui.EndFrame();*/
             DebugSystem.RenderDebug();
             DebugSystem.Render();
             ImGuiController.CheckGLError("End of frame");
+            
+
             SwapBuffers();
             RenderProfiler.Stop();
             DebugSystem.RenderTime = RenderProfiler.ElapsedMilliseconds;
@@ -71,8 +100,10 @@ namespace VoxPopuliLibrary.Engine.Program
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+
             UpdateProfiler.Start();
             base.OnUpdateFrame(e);
+            FontManager.Update(Size.X,Size.Y);
             NetworkProfiler.Start();
             ClientNetwork.Update();
             NetworkProfiler.Stop();
@@ -94,7 +125,7 @@ namespace VoxPopuliLibrary.Engine.Program
                     InputSystem.Grab = false;
                 }
             }
-            if (input.IsKeyPressed(Keys.Insert))
+            if (input.IsKeyPressed(Keys.F1))
             {
                 if (DebugMenu == false)
                 {
@@ -117,6 +148,8 @@ namespace VoxPopuliLibrary.Engine.Program
         {
             base.OnResize(e);
             GL.Viewport(0, 0, Size.X, Size.Y);
+            MenuGUiManager.UpdateScale(e.Width, e.Height);
+            Renderer.UpdateResize(Size.X, Size.Y);
             if (ClientWorldManager.Initialized)
             {
                 if (ClientWorldManager.world.LocalPlayerExist())

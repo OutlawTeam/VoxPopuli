@@ -6,6 +6,8 @@
 using LiteNetLib;
 using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.Network;
+using VoxPopuliLibrary.Engine.World;
+
 namespace VoxPopuliLibrary.Engine.Player
 {
     internal class ServerPlayerFactory
@@ -13,7 +15,7 @@ namespace VoxPopuliLibrary.Engine.Player
         internal Dictionary<ushort, Player> List = new Dictionary<ushort, Player>();
         internal void AddPlayer(ushort clientId, NetPeer peer)
         {
-            Player temp = new Player(new Vector3d(0, 302, 0), clientId, false, false);
+            Player temp = new Player(new Vector3d(0.5,ServerWorldManager.world.WorldGen.GetOrigin()+1,0.5), clientId, false, false);
             foreach (Player otherPlayer in List.Values)
             {
                 if (otherPlayer.ClientID != peer.Id)
@@ -66,6 +68,7 @@ namespace VoxPopuliLibrary.Engine.Player
                 player.Right = data.CRight;
                 player.Elevation = data.Elevation;
                 player.Fly = data.Fly;
+                player.UpdateServer(data.Dt);
             }
         }
         internal void HandlePos(PlayerPositionTP data, NetPeer peer)
