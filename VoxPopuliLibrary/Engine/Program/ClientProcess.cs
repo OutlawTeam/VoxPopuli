@@ -72,22 +72,7 @@ namespace VoxPopuliLibrary.Engine.Program
             {
                 DebugSystem.DebugMenu();
             }
-            /*
-            Panel pan = new Panel(new OpenTK.Mathematics.Vector2i(0,0),
-                new OpenTK.Mathematics.Vector2i(400,1080),
-                new OpenTK.Mathematics.Vector4(0.117f, 0.117f, 0.117f,0.5f));
-            Renderer.RenderImage("MainMenuBackGround", 0, 0, Size.X, Size.Y);
-            pan.Render();*/
-            /*
-             * 
-            Renderer.RenderRec(400,400,200,200,new OpenTK.Mathematics.Vector4(1,0,0,1));
-            Renderer.RenderImage("MainMenuBackGround", 650, 400, 100, 100);
-            Renderer.RenderText("Test", "FreeSans", 400, 400,48, new OpenTK.Mathematics.Vector4(0.117f, 0.117f, 0.177f, 1));*/
-            /*
-            var GUi = new GUI();
-            ImGui.NewFrame();
-            GUi.Render();
-            ImGui.EndFrame();*/
+            UIManager.Render();
             DebugSystem.RenderDebug();
             DebugSystem.Render();
             ImGuiController.CheckGLError("End of frame");
@@ -103,7 +88,7 @@ namespace VoxPopuliLibrary.Engine.Program
 
             UpdateProfiler.Start();
             base.OnUpdateFrame(e);
-            FontManager.Update(Size.X,Size.Y);
+            //FontManager.Update(Size.X,Size.Y);
             NetworkProfiler.Start();
             ClientNetwork.Update();
             NetworkProfiler.Stop();
@@ -140,6 +125,7 @@ namespace VoxPopuliLibrary.Engine.Program
             {
                 ClientWorldManager.UpdateWorld();
             }
+            //MenuManager.Update();
             UpdateProfiler.Stop();
             DebugSystem.UpdateTime = UpdateProfiler.ElapsedMilliseconds;
             UpdateProfiler.Reset();

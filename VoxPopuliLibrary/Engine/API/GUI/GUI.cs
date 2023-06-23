@@ -1,7 +1,6 @@
 ﻿using ImGuiNET;
 using Newtonsoft.Json.Linq;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using SharpFont;
 using System.Data;
 using System.Numerics;
 using System.Reflection.Emit;

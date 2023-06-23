@@ -26,8 +26,9 @@ namespace VoxPopuliLibrary.Engine.World
         internal void HandleChunkUnload(UnloadChunk data, NetPeer peer)
         {
             Vector3i pos = new Vector3i(data.x, data.y, data.z);
-            if (Clist.TryGetValue(pos, out Chunk _))
+            if (Clist.TryGetValue(pos, out Chunk ch))
             {
+                ch = null;
                 Clist.Remove(pos);
             }
         }

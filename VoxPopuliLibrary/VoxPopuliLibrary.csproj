@@ -19,13 +19,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <COMReference Include="{215d64d2-031c-33c7-96e3-61794cd1ee61}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>4</VersionMinor>
+      <VersionMajor>2</VersionMajor>
+      <Guid>215d64d2-031c-33c7-96e3-61794cd1ee61</Guid>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DotnetNoise" Version="1.0.0" />
-    <PackageReference Include="ImGui.NET" Version="1.89.5" />
+    <PackageReference Include="ImGui.NET" Version="1.89.5.2" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.3.5" />
     <PackageReference Include="LiteNetLib" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenTK" Version="4.7.7" />
-    <PackageReference Include="SharpFont" Version="2.5.3" />
+    <PackageReference Include="SharpFont" Version="4.0.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
     <PackageReference Include="Tomlyn" Version="0.16.2" />

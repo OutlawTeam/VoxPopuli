@@ -182,9 +182,10 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
             GL.Enable(EnableCap.DepthTest);
 
         }
+        /*
         public static void RenderText(string text,string font,int x,int y,int size,Vector4 color)
         {
             RessourceManager.RessourceManager.GetFont(font).RenderText(text,color.Xyz,x-1,y+size-13,(float)size/48,new Vector2(1,0));
-        }
+        }*/
     }
 }

@@ -100,10 +100,13 @@ namespace VoxPopuliLibrary.Engine.World
                 }
                 if (!ch.Used || ch.PlayerInChunk.Count == 0)
                 {
-
+                    ch = null;
                     clist.Remove(key);
                 }
-                ch.Used = false;
+                if(ch != null)
+                {
+                    ch.Used = false;
+                }
             }
         }
         internal bool GetBlock(int x, int y, int z, out string id)

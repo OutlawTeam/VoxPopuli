@@ -1,38 +1,57 @@
 ﻿using OpenTK.Mathematics;
+using VoxPopuliLibrary.Engine.API.GUI.Elements;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 
 namespace VoxPopuliLibrary.Engine.API.GUI
 {
     public class Panel
     {
+        List<Widget> widgets;
         bool BackGroundImage = false;
+        public Palette ColorPallete;
         string BackGround;
         Vector4 BackGroundColor;
-        Vector2i Position;
-        Vector2i Size;
-
-        public Panel(Vector2i position, Vector2i size,string backGround)
+        public Position PositionMin;
+        public Position PositionMax;
+        public int ESX = 20;
+        public int ESY = 20;
+        public void AddWidget(Widget wid)
         {
-            Position = position;
-            Size = size;
+            wid.SetPanelParent(this);
+            widgets.Add(wid);
+        }
+        public Panel(Position position, Position size,string backGround,Palette pal)
+        {
+            widgets = new List<Widget>();
+            PositionMin = position;
+            PositionMax = size;
             BackGroundImage = true; 
             BackGround = backGround;
+            ColorPallete = pal;
         }
-        public Panel(Vector2i position, Vector2i size, Vector4 backGround)
+        public Panel(Position position, Position size, Vector4 backGround, Palette pal)
         {
-            Position = position;
-            Size = size;
+            widgets = new List<Widget>();
+            PositionMin = position;
+            PositionMax = size;
             BackGroundColor = backGround;
+            ColorPallete = pal;
         }
         internal void Render()
         {
             if(BackGroundImage)
             {
-                Renderer.RenderImage(BackGround,Position.X,Position.Y,Size.X,Size.Y);
+                Renderer.RenderImage(BackGround, PositionMin.GetRealX(), PositionMin.GetRealY(), PositionMax.GetRealX(), PositionMax.GetRealY());
             }else
             {
-                Renderer.RenderRec(Position.X, Position.Y, Size.X, Size.Y, BackGroundColor);
+                Renderer.RenderRec(PositionMin.GetRealX(), PositionMin.GetRealY(), PositionMax.GetRealX(), PositionMax.GetRealY(), BackGroundColor);
             }
+            foreach(Widget wid in widgets)
+            {
+                wid.Render();
+            }
+            ESX = 20;
+            ESY = 20;
         }
     }
 }

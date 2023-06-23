@@ -71,7 +71,9 @@ namespace VoxPopuliLibrary.Engine.World
             IndexCount = indices.Count;
             GenerateVAO(Vertices);
             Vertice.Clear();
+            Vertice = null;
             indices.Clear();
+            indices = null;
             Changed = false;
         }
         /// <summary>

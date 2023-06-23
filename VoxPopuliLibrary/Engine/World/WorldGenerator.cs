@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using DotnetNoise;
-using SharpFont;
 using VoxPopuliLibrary.Engine.Maths;
 using System.Diagnostics;
 

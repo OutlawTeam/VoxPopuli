@@ -1,6 +1,5 @@
 ﻿using VoxPopuliLibrary.Engine.GraphicEngine;
 using VoxPopuliLibrary.Engine.Physics;
-
 namespace VoxPopuliLibrary.Engine.RessourceManager
 {
     public static partial class RessourceManager
@@ -14,8 +13,6 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
         private static Dictionary<string, Collider[]> Colliders = new Dictionary<string, Collider[]>();
         private static Texture VoxelAtlas;
         private static Dictionary<string, float[]> BlockAtlasTexture = new Dictionary<string, float[]>();
-        private static Dictionary<string, FreeTypeFont> Fonts = new Dictionary<string, FreeTypeFont>();
-
         internal static void LoadRessourcesClient()
         {
             LoadShaders();
@@ -26,7 +23,6 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
             LoadBlockMeshs();
             LoadModels();
             LoadColliders();
-            LoadFonts();
         }
         internal static void LoadRessourcesServer()
         {

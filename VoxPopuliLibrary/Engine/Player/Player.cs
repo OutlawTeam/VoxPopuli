@@ -264,9 +264,9 @@ namespace VoxPopuliLibrary.Engine.Player
             RessourceManager.RessourceManager.GetShader("Entity").SetMatrix4("view", ClientWorldManager.world.LocalPlayerCamera().GetViewMatrix());
             RessourceManager.RessourceManager.GetShader("Entity").SetMatrix4("projection", ClientWorldManager.world.LocalPlayerCamera().GetProjectionMatrix());
             GL.DrawArrays(PrimitiveType.Triangles, 0, _Model._Vertices.Count());
-            GL.BindVertexArray(0);
+            GL.BindVertexArray(0);/*
             RessourceManager.RessourceManager.GetFont("FreeSans").Render3DText(Name, new Vector3(0.85f, 0.78f, 0.09f),
-                new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight + 0.40), (float)Position.Z),0.0075f,new Vector3(180, Rotation.Y-90, 0));
+                new Vector3((float)Position.X, (float)(Position.Y + EntityEYEHeight + 0.40), (float)Position.Z),0.0075f,new Vector3(180, Rotation.Y-90, 0));*/
         }
         //Server
         internal override void UpdateServer(float DT)

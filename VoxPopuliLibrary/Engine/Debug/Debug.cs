@@ -9,6 +9,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using System.Security.Principal;
 using VoxPopuliLibrary.Engine.API;
+using VoxPopuliLibrary.Engine.API.GUI;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
@@ -20,6 +21,8 @@ namespace VoxPopuliLibrary.Engine.Debug
         internal static int x;
         internal static int y;
         internal static bool Fullscreen;
+        internal static bool Menu;
+        internal static bool CheckTest;
         // progiller variable
         internal static double RenderTime = 0;
         internal static double UpdateTime = 0;
@@ -71,6 +74,15 @@ namespace VoxPopuliLibrary.Engine.Debug
                 ImGui.SameLine();
                 ImGui.InputInt("Window Y Size", ref y);
                 if (ImGui.Button("Resize")) { API.API.ResizeWindow(x, y); }
+                ImGui.Checkbox("MainMenu", ref Menu);
+                if(Menu)
+                {
+                    UIManager.SetMenu("MainMenu");
+                }else
+                {
+                    UIManager.SetMenu("void");
+                }
+                ImGui.Text(CheckTest.ToString());
                 if(ImGui.Checkbox("Fullscreen",ref Fullscreen)) { API.API.SetFullscreen(Fullscreen); };
                 if (ImGui.MenuItem("PlayerMenu")) { PlayerMenu = true; }
                 if (ImGui.MenuItem("Voxel Menu")) { VoxelMenu = true; }
@@ -296,10 +308,6 @@ namespace VoxPopuliLibrary.Engine.Debug
                         RenderSystem.RenderDebugBox(ChunkBox, new Vector3(ch.Position.X * 16, ch.Position.Y * 16, ch.Position.Z * 16));
                     }
                 }
-            }
-            if(DebugFont)
-            {
-                RessourceManager.RessourceManager.GetFont("Pixeloid").RenderText("This is sample text",new Vector3(1,0,0), 25.0f, 50.0f, 0.5f, new Vector2(1f, 0f));
             }
         }
         /// <summary>

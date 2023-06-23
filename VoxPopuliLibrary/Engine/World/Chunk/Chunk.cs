@@ -5,7 +5,6 @@
  * Information: Séparer les shader pour les chunk et ceux des entités
  */
 using OpenTK.Mathematics;
-using VoxPopuliLibrary.Engine.Player;
 
 namespace VoxPopuliLibrary.Engine.World
 {

@@ -8,9 +8,14 @@ namespace VoxPopuliLibrary.Engine.API
 {
     internal static class Utils
     {
+        static StringBuilder builder = new StringBuilder();
         public static string GetName(string NameSpace,string Name)
         {
-            return NameSpace +":"+ Name;
+            builder.Clear();
+            builder.Append(NameSpace);
+            builder.Append(":");
+            builder.Append(Name);
+            return builder.ToString();
         }
     }
 }
