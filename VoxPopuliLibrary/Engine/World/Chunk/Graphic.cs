@@ -213,9 +213,9 @@ namespace VoxPopuliLibrary.Engine.World
         }
         private int CalculateAO(Vector3 vertpos,Vector3i bpos)
         {
-            int StepY = vertpos.Y  <= 0.5 ? -1: 1;
-            int StepX = vertpos.X  <= 0.5 ? -1: 1;
-            int StepZ = vertpos.Z  <= 0.5 ? -1: 1;
+            int StepY = vertpos.Y  < 0.5 ? -1: 1;
+            int StepX = vertpos.X  < 0.5 ? -1: 1;
+            int StepZ = vertpos.Z  < 0.5 ? -1: 1;
             string Side1 = ClientWorldManager.world.GetChunkManagerClient().
                 GetBlockForMesh(new Vector3i(bpos.X +StepX,bpos.Y+StepY,bpos.Z),Position);
             string Side2 = ClientWorldManager.world.GetChunkManagerClient().

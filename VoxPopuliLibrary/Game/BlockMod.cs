@@ -12,21 +12,21 @@ namespace VoxPopuliLibrary.Game
         public static Block stoneslab;
         static BlockMod()
         {
-            dirt = RegisterBlock("dirt", new Block(new BlockBuilder().SetTexture(new BlockTexture { AllFace = "dirt" })));
-            grass = RegisterBlock("grass", new Block(new BlockBuilder().SetTexture(new BlockTexture
+            dirt = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace,"dirt"), new Block(new BlockBuilder().SetTexture(new BlockTexture { AllFace = "dirt" })));
+            grass = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, "grass"), new Block(new BlockBuilder().SetTexture(new BlockTexture
             { AllFace = "grass", TopTexture = "grass_top", BottomTexture = "dirt" })));
-            stone = RegisterBlock("stone", new Block(new BlockBuilder().SetTexture(new BlockTexture
+            stone = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, "stone"), new Block(new BlockBuilder().SetTexture(new BlockTexture
             { AllFace = "stone" })));
-            cobblestone = RegisterBlock("cobblestone", new Block(new BlockBuilder().SetTexture(new BlockTexture
+            cobblestone = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, "cobblestone"), new Block(new BlockBuilder().SetTexture(new BlockTexture
             { AllFace = "cobblestone" })));
-            water = RegisterBlock("water", new Block(new BlockBuilder().SetTexture(new BlockTexture
+            water = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, "water"), new Block(new BlockBuilder().SetTexture(new BlockTexture
             { AllFace = "water" }).SetTransparency(true).SetCollider("Nothing")));
-            stoneslab = RegisterBlock("stone_slab",new Block(new BlockBuilder().SetTexture(new BlockTexture { AllFace ="stone"})
+            stoneslab = RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, "stone_slab"),new Block(new BlockBuilder().SetTexture(new BlockTexture { AllFace ="stone"})
                 .SetCollider("Slab").SetMesh("Slab").SetRenderType(BlockRenderType.Other).SetTransparency(true)));
         }
         private static Block RegisterBlock(string Name, Block block)
         {
-            return BlockRegister.RegisterBlock(Utils.GetName(VoxPopuliMod.NameSpace, Name),block);
+            return BlockRegister.RegisterBlock(Name,block);
         }
         public static void RegistersBlocks()
         {

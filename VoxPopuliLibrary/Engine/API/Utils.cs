@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoxPopuliLibrary.Engine.API
 {
-    internal static class Utils
+    public static class Utils
     {
         static StringBuilder builder = new StringBuilder();
         public static string GetName(string NameSpace,string Name)
