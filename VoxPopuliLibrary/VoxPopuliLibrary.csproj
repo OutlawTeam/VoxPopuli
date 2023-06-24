@@ -34,7 +34,6 @@
     <PackageReference Include="LiteNetLib" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenTK" Version="4.7.7" />
-    <PackageReference Include="SharpFont" Version="4.0.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
     <PackageReference Include="Tomlyn" Version="0.16.2" />
