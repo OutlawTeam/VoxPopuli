@@ -5,7 +5,7 @@ namespace VoxPopuliLibrary.Engine.Debug
 {
     internal struct DebugBox
     {
-        public int VAO;
+        public int VAO, VBO;
         int EBO;
         public Vector4 Color;
         public DebugBox(Vector3d BoxSize, Vector4 color)
@@ -34,7 +34,7 @@ namespace VoxPopuliLibrary.Engine.Debug
                         0, 4, 1, 5, 2, 6, 3, 7  // Lignes entre les plans
                     };
             VAO = GL.GenVertexArray();
-            int VBO = GL.GenBuffer();
+            VBO = GL.GenBuffer();
             GL.BindVertexArray(VAO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);

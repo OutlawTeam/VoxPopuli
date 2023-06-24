@@ -6,7 +6,7 @@ using VoxPopuliLibrary.Engine.GraphicEngine;
 using System.Reflection.Emit;
 
 namespace VoxPopuliLibrary.Engine.API.GUI.Elements
-{
+{/*
     internal class CheckBox : Widget
     {
         public bool Value = false;
@@ -50,5 +50,5 @@ namespace VoxPopuliLibrary.Engine.API.GUI.Elements
             //Renderer.RenderText(Label,"FreeSans", x + 48, y+13,20,Panel.ColorPallete.Text); // drawing the message
 
         }
-    }
+    }*/
 }

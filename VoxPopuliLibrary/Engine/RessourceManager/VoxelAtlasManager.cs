@@ -18,7 +18,7 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
             }
             else
             {
-                throw new Exception("The demanded texture coordinates doesn't existe :" + Name);
+                return BlockAtlasTexture["unknow"];
             }
         }
         private static void LoadVoxelAtlas()

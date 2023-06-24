@@ -13,7 +13,7 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
             {
                 try
                 {
-                    GuiTextures.Add(Path.GetFileNameWithoutExtension(filePath), Texture.LoadFromFile(filePath));
+                    GuiTextures.Add(Path.GetFileNameWithoutExtension(filePath), Texture.LoadFromFileGUI(filePath));
                 }
                 catch
                 {
@@ -29,7 +29,7 @@ namespace VoxPopuliLibrary.Engine.RessourceManager
                     {
                         try
                         {
-                            GuiTextures.Add(Path.GetFileNameWithoutExtension(filePath), Texture.LoadFromFile(filePath));
+                            GuiTextures.Add(Path.GetFileNameWithoutExtension(filePath), Texture.LoadFromFileGUI(filePath));
                         }
                         catch
                         {

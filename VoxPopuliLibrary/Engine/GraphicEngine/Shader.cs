@@ -185,6 +185,11 @@ namespace VoxPopuliLibrary.Engine.GraphicEngine
         /// </summary>
         /// <param name="name">The name of the uniform</param>
         /// <param name="data">The data to set</param>
+        internal void SetVector2(string name, Vector2 data)
+        {
+            GL.UseProgram(Handle);
+            GL.Uniform2(_uniformLocations[name], data);
+        }
         internal void SetVector3(string name, Vector3 data)
         {
             GL.UseProgram(Handle);

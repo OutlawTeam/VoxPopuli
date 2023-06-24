@@ -1,9 +1,6 @@
-﻿using OpenTK.Mathematics;
-using VoxPopuliLibrary.Engine.API;
-using VoxPopuliLibrary.Engine.RessourceManager;
-using VoxPopuliLibrary.Game;
+﻿using VoxPopuliLibrary.Engine.API;
 
-namespace VoxPopuli
+namespace VoxPopuliLibrary.Game
 {
     internal  class VoxPopuliMod : IMod
     {

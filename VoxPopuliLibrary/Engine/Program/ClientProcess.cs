@@ -14,6 +14,7 @@ using VoxPopuliLibrary.Engine.API.GUI;
 using VoxPopuliLibrary.Engine.API.Input;
 using VoxPopuliLibrary.Engine.Debug;
 using VoxPopuliLibrary.Engine.GraphicEngine;
+using VoxPopuliLibrary.Engine.GraphicEngine.FontRenderer;
 using VoxPopuliLibrary.Engine.Init;
 using VoxPopuliLibrary.Engine.ModdingSystem;
 using VoxPopuliLibrary.Engine.Network;
@@ -47,7 +48,7 @@ namespace VoxPopuliLibrary.Engine.Program
             RenderSystem.Init(this);
             Engine.API.API.Init(this);
             MenuGUiManager.UpdateScale( Size.X , Size.Y);
-            ClientInit.Init();
+            ClientEngineInit.Init();
             ClientNetwork.Init();
             ClientNetwork.Update();
         }
@@ -73,10 +74,12 @@ namespace VoxPopuliLibrary.Engine.Program
                 DebugSystem.DebugMenu();
             }
             UIManager.Render();
+            
             DebugSystem.RenderDebug();
             DebugSystem.Render();
+
             ImGuiController.CheckGLError("End of frame");
-            
+            TextMaster.render();
 
             SwapBuffers();
             RenderProfiler.Stop();

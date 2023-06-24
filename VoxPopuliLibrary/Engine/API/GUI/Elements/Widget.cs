@@ -8,13 +8,14 @@ namespace VoxPopuliLibrary.Engine.API.GUI.Elements
 {
     public class Widget
     {
-        public Panel Panel;
-        public string Label;
-        public void SetPanelParent(Panel panel)
+        public void SetPanelParent()
         {
-            Panel = panel;
         }
         public virtual void Render()
+        {
+
+        }
+        public virtual void Update()
         {
 
         }

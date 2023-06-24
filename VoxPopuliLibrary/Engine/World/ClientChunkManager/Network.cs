@@ -28,6 +28,7 @@ namespace VoxPopuliLibrary.Engine.World
             Vector3i pos = new Vector3i(data.x, data.y, data.z);
             if (Clist.TryGetValue(pos, out Chunk ch))
             {
+                ch.DeleteBuffer();
                 ch = null;
                 Clist.Remove(pos);
             }

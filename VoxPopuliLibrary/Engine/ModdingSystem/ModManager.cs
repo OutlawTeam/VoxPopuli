@@ -10,8 +10,8 @@ namespace VoxPopuliLibrary.Engine.ModdingSystem
     {
         static Dictionary<string,IMod> ModList = new Dictionary<string, IMod>();
         internal static List<string> ModAssetFolder = new List<string>();
-        const string BaseModFolder = "mods";
-        const string BaseTempModFolder = "temp/mods";
+        static string BaseModFolder = "mods";
+        static string BaseTempModFolder = "temp/mods";
         internal static void LoadMods()
         {
             DirectoryInfo di = new DirectoryInfo(BaseTempModFolder);
@@ -69,7 +69,7 @@ namespace VoxPopuliLibrary.Engine.ModdingSystem
         }
         internal static void Init()
         {
-            ModList.Add("VoxPopuli",new VoxPopuli.VoxPopuliMod());
+            ModList.Add("VoxPopuli",new VoxPopuliLibrary.Game.VoxPopuliMod());
             foreach (IMod mod in ModList.Values)
             {
                 try

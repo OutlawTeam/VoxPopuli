@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+﻿/*using ImGuiNET;
 using Newtonsoft.Json.Linq;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Data;
@@ -8,7 +8,8 @@ using VoxPopuliLibrary.Engine.API;
 using VoxPopuliLibrary.Engine.Maths;
 
 namespace VoxPopuliLibrary.Engine.API.GUI
-{
+{*/
+    /*
     public class GUI
     {
         int ESX = 10;
@@ -45,9 +46,9 @@ namespace VoxPopuliLibrary.Engine.API.GUI
             o.type = ObjectType.RECTANGLE;
             objects.Add(o); // now put our object on the object list, so we can reverse the order later
         }
-        void DrawMessage(/*ImFont* font,*/ string text, int x, int y, uint col = 4294967295) {
-            Object o = new Object();
-            /*o.font = font;*/
+        void DrawMessage(/*ImFont* font,*//* string text, int x, int y, uint col = 4294967295) {
+            Object o = new Object();*/
+            /*o.font = font;*//*
             o.text = text;
             o.x = x;
             o.y = y;
@@ -86,7 +87,7 @@ namespace VoxPopuliLibrary.Engine.API.GUI
                         }
                     case ObjectType.TEXT:
                         {
-                            DrawMessageA(/*obj.font,*/ obj.text, obj.x, obj.y, obj.col);
+                            DrawMessageA(/*obj.font,*//* obj.text, obj.x, obj.y, obj.col);
                             break;
                         }
 
@@ -188,7 +189,7 @@ namespace VoxPopuliLibrary.Engine.API.GUI
         public static uint ColorToUInt(float r, float g, float b, float a)
         {
             return ImGui.ColorConvertFloat4ToU32(new Vector4(r,g,b,a));
-        }
-    }
+        }*/
+   /* }
 
-}
+}*/

@@ -13,9 +13,9 @@ namespace VoxPopuliLibrary.Engine.World
         public WorldGenerator WorldGen;
         public int CHUNK_SIZE { get { return 16; } }
         public int Height;
-
-        internal int VerticalRenderDistance = 5;
-        internal int RenderDistance = 7;
+        internal int RenderDistance = 32;
+        internal int VerticalRenderDistance = 9;
+        
         internal int LoadDistance { get { return RenderDistance + 3; } }
         internal int VerticalLoadDistance { get { return VerticalRenderDistance + 3; } }
 

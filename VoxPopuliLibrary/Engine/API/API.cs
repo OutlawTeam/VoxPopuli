@@ -32,11 +32,24 @@ namespace VoxPopuliLibrary.Engine.API
         }
         public static int WindowWidth()
         {
-            return window.Size.X;
+            if(window != null)
+            {
+                return window.Size.X;
+            }else
+            {
+                return 1000;
+            }
+            
         }
         public static int WindowHeight()
         {
-            return window.Size.Y;
+            if (window != null)
+            {
+                return window.Size.Y;
+            }else
+            {
+                return 800;
+            }
         }
     }
 }

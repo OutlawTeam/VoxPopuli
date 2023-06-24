@@ -5,10 +5,10 @@
  * Information: Séparer les shader pour les chunk et ceux des entités
  */
 using OpenTK.Mathematics;
-
+using OpenTK.Graphics.OpenGL4;
 namespace VoxPopuliLibrary.Engine.World
 {
-    internal partial class Chunk
+    internal partial class Chunk 
     {
         //Chunk state for meshing
         public bool Changed = true;
@@ -23,6 +23,7 @@ namespace VoxPopuliLibrary.Engine.World
         internal Palette ChunkPalette;
         //Chunk data
         public byte[] Blocks = new byte[(int)Math.Pow(16, 3)];
+
         /// <summary>
         /// Générate chunk for server
         /// </summary>
@@ -33,6 +34,12 @@ namespace VoxPopuliLibrary.Engine.World
             Position = Pos;
             ChunkPalette = new Palette();
             ServerWorldManager.world.WorldGen.GenerateChunk(this);
+        }
+        internal void DeleteBuffer()
+        {
+            GL.DeleteBuffer(VBO);
+            GL.DeleteBuffer(EBO);
+            GL.DeleteVertexArray(VAO);
         }
         /// <summary>
         /// Create chunk with receved chunk data for client
@@ -54,5 +61,6 @@ namespace VoxPopuliLibrary.Engine.World
             }
             InitGraphic();
         }
-    };
+
+    }
 }

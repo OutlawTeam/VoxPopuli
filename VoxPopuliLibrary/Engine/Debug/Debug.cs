@@ -77,10 +77,10 @@ namespace VoxPopuliLibrary.Engine.Debug
                 ImGui.Checkbox("MainMenu", ref Menu);
                 if(Menu)
                 {
-                    UIManager.SetMenu("MainMenu");
+                    UIManager.SetUiShow("MainMenu",true);
                 }else
                 {
-                    UIManager.SetMenu("void");
+                    UIManager.SetUiShow("MainMenu", false);
                 }
                 ImGui.Text(CheckTest.ToString());
                 if(ImGui.Checkbox("Fullscreen",ref Fullscreen)) { API.API.SetFullscreen(Fullscreen); };

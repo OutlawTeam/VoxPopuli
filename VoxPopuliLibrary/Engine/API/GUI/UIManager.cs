@@ -2,42 +2,47 @@
 {
     public static class UIManager
     {
-        static Dictionary<string ,Menu> Menus = new Dictionary<string ,Menu>();
+        static Dictionary<string ,UI> uis = new Dictionary<string ,UI>();
         static bool ShowMenu = false;
-        static Menu Current;
+        static int frame = 0;
 
-        public static void AddMenu(string menuName,Menu menu)
+        public static void AddUI(string menuName,UI menu)
         {
-            Menus.Add(menuName, menu);
+            uis.Add(menuName, menu);
         }
-        public static void SetMenu(string MenuName)
+        public static void SetUiShow(string MenuName,bool show)
         {
-            if(MenuName == "void")
+            if (uis.TryGetValue(MenuName, out UI ui))
             {
-                ShowMenu = false;
-            }else
-            {
-                if (Menus.TryGetValue(MenuName, out Menu menu))
-                {
-                    ShowMenu = true;
-                    Current = menu;
-                }
+                ui.Show = show;
             }
         }
         public static void Render()
         {
-            if (ShowMenu)
+            foreach(UI ui in uis.Values)
             {
-                Current.Render();
+                if(ui.Show)
+                {
+                    ui.Render();
+                }
+            }
+            frame++;
+
+            if(frame >= 240)
+            {
+                GC.Collect(GC.MaxGeneration,GCCollectionMode.Aggressive,true,true);
+                frame = 0;
             }
         }
         public static void Update()
         {
-            if(ShowMenu) 
+            foreach (UI ui in uis.Values)
             {
-                Current.Update();
+                if (ui.Show)
+                {
+                    ui.Update();
+                }
             }
-           
         }
         public static bool CIN(int x, int y, int w, int h)
         { // cursor in region

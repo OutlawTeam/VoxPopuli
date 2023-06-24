@@ -9,15 +9,18 @@
     <AssemblyVersion>1.2023.0402.8492</AssemblyVersion>
     <FileVersion>1.2023.0402.8492</FileVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <ErrorReport>prompt</ErrorReport>
+    <Authors>OutlawTeam</Authors>
+    <RepositoryUrl>https://github.com/OutlawTeam/VoxPopuli</RepositoryUrl>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants);CLIENT</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants);CLIENT</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 

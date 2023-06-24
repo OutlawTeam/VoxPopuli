@@ -1,5 +1,4 @@
-﻿using VoxPopuli;
-using VoxPopuliLibrary.Engine.API;
+﻿using VoxPopuliLibrary.Engine.API;
 
 namespace VoxPopuliLibrary.Game
 {

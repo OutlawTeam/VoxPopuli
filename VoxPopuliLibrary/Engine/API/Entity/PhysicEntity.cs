@@ -256,14 +256,14 @@ namespace VoxPopuliLibrary.Engine.API
 
 
         }
-        internal virtual void UpdateClient(float DT)
+        internal override void UpdateClient(float DT)
         {
             base.UpdateClient(DT);
             Velocity += Acceleration * DT * Friction;
             Acceleration = new Vector3(0);
             UpdateCollider();
         }
-        internal virtual void UpdateServer(float DT)
+        internal override void UpdateServer(float DT)
         {
             Velocity += Acceleration * DT * Friction;
             Acceleration = new Vector3(0);
