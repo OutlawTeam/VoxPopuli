@@ -3,6 +3,8 @@ using VoxPopuliLibrary.Engine.API.GUI;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 using OpenTK.Mathematics;
 using VoxPopuliLibrary.Engine.API.GUI.Elements;
+using VoxPopuliLibrary.Engine.Network;
+using VoxPopuliLibrary.Engine.Program;
 
 namespace VoxPopuliLibrary.Engine.GUI
 {
@@ -10,7 +12,7 @@ namespace VoxPopuliLibrary.Engine.GUI
     {
         public MainUI()
         {
-            widgets.Add(new Button("Singleplayer", ()=>{ Console.WriteLine("Singlelayer");},new Vector2(0.0125f,0.2f), new Vector2(0.175f,0.075f)));
+            widgets.Add(new Button("Singleplayer", LaunchSinglePlayer,new Vector2(0.0125f,0.2f), new Vector2(0.175f,0.075f)));
             widgets.Add(new Button("Multiplayer", ()=>{ Console.WriteLine("Multiplayer");},new Vector2(0.0125f,0.3f), new Vector2(0.175f,0.075f)));
             widgets.Add(new Button("Options", ()=>{ Console.WriteLine("Options");},new Vector2(0.0125f,0.4f), new Vector2(0.175f,0.075f)));
             widgets.Add(new Button("Code Editor for later", ()=>{ Console.WriteLine("Code Editor for later");},new Vector2(0.0125f,0.5f), new Vector2(0.175f,0.075f)));
@@ -27,6 +29,12 @@ namespace VoxPopuliLibrary.Engine.GUI
         public override void Update()
         {
             base.Update();
+        }
+        public static void LaunchSinglePlayer()
+        {
+            ServerThread.RunServerThread();
+            ClientNetwork.Connect("localhost",23482);
+            UIManager.SetUiShow("MainMenu", false);
         }
     }
 }

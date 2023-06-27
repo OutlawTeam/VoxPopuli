@@ -29,7 +29,10 @@ namespace VoxPopuliLibrary.Engine.Program
     {
         //Debug menu
         private bool DebugMenu = false;
-        
+
+        //Server thread 
+        internal static Thread ServerLocalThread;
+
         // Créer une instance de Stopwatch
         Stopwatch RenderProfiler = new Stopwatch();
         Stopwatch UpdateProfiler = new Stopwatch();

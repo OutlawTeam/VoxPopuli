@@ -30,7 +30,7 @@ namespace VoxPopuliLibrary.Engine.Program
         /____/\_, /    \____/\_,_/\__/_/\_,_/|__,__/     /_/  \__/\_,_/_/_/_/
              /___/                                                           
         ";
-        public static void Main(bool Standalone)
+        public static void Main(bool Standalone,int port)
         {
             Console.SetWindowSize(100, 25);
             Console.WriteLine(Title);
@@ -57,7 +57,7 @@ namespace VoxPopuliLibrary.Engine.Program
             }
             ServerWorldManager.InitWorld();
             Console.WriteLine("World have been Initialize");
-            ServerNetwork.StartServer(23482);
+            ServerNetwork.StartServer(port);
             Console.WriteLine("Network have been Initialized");
 
             Console.WriteLine("The server has finished initializing, it is now ready at: " + ServerNetwork.server.LocalPort);

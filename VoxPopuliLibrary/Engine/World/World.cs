@@ -64,7 +64,7 @@ namespace VoxPopuliLibrary.Engine.World
             {
                 if (PlayerFactoryClient.LocalPlayerExist)
                 {
-                    ChunkManagerClient.Update(PlayerFactoryClient.LocalPlayer.Position);
+                    ChunkManagerClient.Update();
                 }
                 PlayerFactoryClient.Update((float)InputSystem.FrameEvent.Time,
                     InputSystem.Keyboard, InputSystem.Mouse, InputSystem.Grab);

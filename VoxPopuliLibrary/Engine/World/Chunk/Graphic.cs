@@ -66,15 +66,22 @@ namespace VoxPopuliLibrary.Engine.World
                     }
                 }
             }
-            var Vertices = Vertice.ToArray();
-            VerticeCount = Vertices.Length;
-            IndexCount = indices.Count;
-            GenerateVAO(Vertices);
-            Vertice.Clear();
-            Vertice = null;
-            indices.Clear();
-            indices = null;
-            Changed = false;
+            
+        }
+        internal void GenerateOG()
+        {
+            if( Vertice.Count >0)
+            {
+                var Vertices = Vertice.ToArray();
+                VerticeCount = Vertices.Length;
+                IndexCount = indices.Count;
+                GenerateVAO(Vertices);
+                Vertice.Clear();
+                Vertice = null;
+                indices.Clear();
+                indices = null;
+                Changed = false;
+            }
         }
         /// <summary>
         /// Generate mesh faces
@@ -211,6 +218,7 @@ namespace VoxPopuliLibrary.Engine.World
             indices.AddRange(indice);
             IndexCounter += 4;
         }
+
         private int CalculateAO(Vector3 vertpos,Vector3i bpos)
         {
             int StepY = vertpos.Y  < 0.5 ? -1: 1;

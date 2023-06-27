@@ -11,6 +11,7 @@ namespace VoxPopuliLibrary.Engine.Init
         public static void Init()
         {
             UIManager.AddUI("MainMenu",new MainUI());
+            UIManager.SetUiShow("MainMenu", true);
         }
     }
 }

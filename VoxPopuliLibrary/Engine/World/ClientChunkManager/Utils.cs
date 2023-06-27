@@ -45,7 +45,7 @@ namespace VoxPopuliLibrary.Engine.World
                 return GetChunk(Rpos.X,Rpos.Y,Rpos.Z).GetBlock(bpos.X,bpos.Y,bpos.Z);
             }catch(Exception ex)
             {
-                throw new Exception("The demanded chunk is not loaded"+ex);
+                return "air";
             }
         }
         internal Chunk GetChunk(int x, int y, int z)
@@ -56,7 +56,8 @@ namespace VoxPopuliLibrary.Engine.World
             }
             else
             {
-                throw new Exception("Chunk is not loaded");
+                byte zero = 0;
+                return new Chunk(Enumerable.Repeat(zero, 4096).ToArray(), new Palette(), new Vector3i(x, y, z));
             }
         }
         internal void ChangeChunk(Vector3d blockp, string block)

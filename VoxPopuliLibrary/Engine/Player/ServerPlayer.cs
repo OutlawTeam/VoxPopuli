@@ -5,6 +5,7 @@
  */
 using LiteNetLib;
 using OpenTK.Mathematics;
+using System.Net.Sockets;
 using VoxPopuliLibrary.Engine.Network;
 using VoxPopuliLibrary.Engine.World;
 
@@ -30,6 +31,29 @@ namespace VoxPopuliLibrary.Engine.Player
 
             PlayerSpawn packety = new PlayerSpawn { ClientID = temp.ClientID, Position = temp.Position };
             ServerNetwork.SendPacketToAllWithoutOnePeer(packety,peer, DeliveryMethod.ReliableOrdered);
+            if(ServerWorldManager.world.GetChunkManagerServer().clist.TryGetValue((Vector3i)temp.Position/16,out var ch))
+            {
+                ch.PlayerInChunk.Add(temp);
+                ServerChunkData chunkData = new ServerChunkData();
+                chunkData.importance = 0;
+                chunkData.x = ch.Position.X;
+                chunkData.y = ch.Position.Y;
+                chunkData.z = ch.Position.Z;
+                chunkData.data = new ChunkData { data = ch.Blocks, pal = ch.ChunkPalette };
+                ServerNetwork.SendPacket(chunkData, peer, DeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                var chs =ServerWorldManager.world.GetChunkManagerServer().CreateChunk((Vector3i)temp.Position / 16);
+                chs.PlayerInChunk.Add(temp);
+                ServerChunkData chunkData = new ServerChunkData();
+                chunkData.importance = 0;
+                chunkData.x = chs.Position.X;
+                chunkData.y = chs.Position.Y;
+                chunkData.z = chs.Position.Z;
+                chunkData.data = new ChunkData { data = chs.Blocks, pal = chs.ChunkPalette };
+                ServerNetwork.SendPacket(chunkData, peer, DeliveryMethod.ReliableOrdered);
+            }
         }
         internal void RemovePlayer(ushort clientId)
         {

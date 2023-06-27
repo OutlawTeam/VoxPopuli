@@ -1,4 +1,6 @@
-﻿using LiteNetLib;
+﻿using K4os.Compression.LZ4;
+using K4os.Compression.LZ4.Encoders;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
 namespace VoxPopuliLibrary.Engine.World
@@ -6,6 +8,7 @@ namespace VoxPopuliLibrary.Engine.World
     #region[ServerChunkData]
     internal struct ServerChunkData : INetSerializable
     {
+        public int importance;
         public int x;
         public int y;
         public int z;
@@ -25,15 +28,17 @@ namespace VoxPopuliLibrary.Engine.World
 #pragma warning restore SYSLIB0011 // Le type ou le membre est obsolète
                 serializedBytes = stream.ToArray();
             }
-            writer.Put(serializedBytes);
+            byte[] combyte =  LZ4Pickler.Pickle(serializedBytes);
+            writer.Put(combyte);
         }
         public void Deserialize(NetDataReader reader)
         {
             x = reader.GetInt();
             y = reader.GetInt();
             z = reader.GetInt();
+            byte[] decom = LZ4Pickler.Unpickle(reader.GetRemainingBytes());
             BinaryFormatter formatter = new BinaryFormatter();
-            using (MemoryStream stream = new MemoryStream(reader.GetRemainingBytes()))
+            using (MemoryStream stream = new MemoryStream(decom))
             {
 #pragma warning disable SYSLIB0011 // Le type ou le membre est obsolète
                 data = (ChunkData)formatter.Deserialize(stream);

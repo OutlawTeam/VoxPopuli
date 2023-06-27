@@ -17,8 +17,6 @@ namespace VoxPopuliLibrary.Engine.World
         //Chunk data
         //Chunk coordinates
         public Vector3i Position;
-        //
-        internal bool Used = true;
         internal bool Empty = false;
         internal Palette ChunkPalette;
         //Chunk data

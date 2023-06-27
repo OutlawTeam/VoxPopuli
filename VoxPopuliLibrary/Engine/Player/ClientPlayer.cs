@@ -63,9 +63,10 @@ namespace VoxPopuliLibrary.Engine.Player
                 if (player != LocalPlayer)
                 {
                     player.Rotation = data.Rotation;
+                    player.UpdateCollider();
+                    player.Position = data.Position;
+                    player.Name = data.Name;
                 }
-                player.Position = data.Position;
-                player.Name = data.Name;
             }
         }
         internal void HandleDeco(PlayerDeco data, NetPeer peer)
