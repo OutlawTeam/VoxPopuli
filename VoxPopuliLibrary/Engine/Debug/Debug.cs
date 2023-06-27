@@ -12,6 +12,7 @@ using VoxPopuliLibrary.Engine.API;
 using VoxPopuliLibrary.Engine.API.GUI;
 using VoxPopuliLibrary.Engine.GraphicEngine;
 using VoxPopuliLibrary.Engine.Network;
+using VoxPopuliLibrary.Engine.Program;
 using VoxPopuliLibrary.Engine.World;
 namespace VoxPopuliLibrary.Engine.Debug
 {
@@ -54,8 +55,6 @@ namespace VoxPopuliLibrary.Engine.Debug
         internal static bool ShowAABB;
         //Imgui Controller
         static ImGuiController Controller;
-
-        static Thread ServerLocalThread = new Thread(() => Program.Program.Main(false));
 
         /// <summary>
         /// Function who draw debug menu
@@ -234,7 +233,7 @@ namespace VoxPopuliLibrary.Engine.Debug
             ImGui.Separator();
             if (ImGui.Button("StartLocalServer"))
             {
-                ServerLocalThread.Start();
+                ServerThread.RunServerThread();
             }
             ImGui.End();
         }
@@ -253,7 +252,6 @@ namespace VoxPopuliLibrary.Engine.Debug
             ImGui.Text("Chunks which have mesh update");
             if (ClientWorldManager.Initialized)
             {
-                ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkMeshUpdated.ToString());
                 ImGui.Text("Chunks rendered");
                 ImGui.Text(ClientWorldManager.world.GetChunkManagerClient().ChunkRendered.ToString());
             }

@@ -1,12 +1,5 @@
-﻿using K4os.Compression.LZ4;
-using LiteNetLib;
-using LiteNetLib.Utils;
+﻿using LiteNetLib;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-
 namespace VoxPopuliLibrary.Engine.World
 {
     internal partial class ClientChunkManager
@@ -17,9 +10,10 @@ namespace VoxPopuliLibrary.Engine.World
             if (!Clist.TryGetValue(pos, out Chunk _))
             {
                 Clist.Add(pos, new Chunk(data.data.data, data.data.pal, pos));
+                Clist[pos].Changed = true;
                 if (Clist[pos].Empty == false)
                 {
-                    ChunkMesh.Add(Clist[pos]);
+                    ChunkToBeMesh.Enqueue(Clist[pos]);
                 }
             }
         }
@@ -46,7 +40,7 @@ namespace VoxPopuliLibrary.Engine.World
                     {
                         ch.Empty = false;
                         ch.Changed = true;
-                        ChunkMesh.Add(ch);
+                        ChunkToBeMesh.Enqueue(ch);
                     }
                 }
                 else
@@ -58,7 +52,7 @@ namespace VoxPopuliLibrary.Engine.World
                     else
                     {
                         ch.Changed = true;
-                        ChunkMesh.Add(ch);
+                        ChunkToBeMesh.Enqueue(ch);
                     }
                 }
             }
@@ -67,7 +61,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch1.Empty == false)
                 {
                     ch1.Changed = true;
-                    ChunkMesh.Add(ch1);
+                    ChunkToBeMesh.Enqueue(ch1);
                 }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X - 1, cpos.Y, cpos.Z), out Chunk ch2))
@@ -75,7 +69,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch2.Empty == false)
                 {
                     ch2.Changed = true;
-                    ChunkMesh.Add(ch2);
+                    ChunkToBeMesh.Enqueue(ch2);
                 }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y - 1, cpos.Z), out Chunk ch3))
@@ -83,7 +77,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch3.Empty == false)
                 {
                     ch3.Changed = true;
-                    ChunkMesh.Add(ch3);
+                    ChunkToBeMesh.Enqueue(ch3);
                 }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y + 1, cpos.Z), out Chunk ch4))
@@ -91,7 +85,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch4.Empty == false)
                 {
                     ch4.Changed = true;
-                    ChunkMesh.Add(ch4);
+                    ChunkToBeMesh.Enqueue(ch4);
                 }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y, cpos.Z + 1), out Chunk ch5))
@@ -99,7 +93,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch5.Empty == false)
                 {
                     ch5.Changed = true;
-                    ChunkMesh.Add(ch5);
+                    ChunkToBeMesh.Enqueue(ch5);
                 }
             }
             if (Clist.TryGetValue(new Vector3i(cpos.X, cpos.Y, cpos.Z - 1), out Chunk ch6))
@@ -107,7 +101,7 @@ namespace VoxPopuliLibrary.Engine.World
                 if (ch6.Empty == false)
                 {
                     ch6.Changed = true;
-                    ChunkMesh.Add(ch6);
+                    ChunkToBeMesh.Enqueue(ch6);
                 }
             }
         }
